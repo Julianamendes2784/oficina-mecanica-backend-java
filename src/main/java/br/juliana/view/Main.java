@@ -1,13 +1,7 @@
 package br.juliana.view;
 
-import br.juliana.dao.ClienteDAO;
-import br.juliana.dao.ColaboradorDAO;
-import br.juliana.dao.ServicoDAO;
-import br.juliana.dao.VeiculoDAO;
-import br.juliana.model.Cliente;
-import br.juliana.model.Colaborador;
-import br.juliana.model.Servico;
-import br.juliana.model.Veiculo;
+import br.juliana.dao.*;
+import br.juliana.model.*;
 
 import java.util.Scanner;
 import java.util.List;
@@ -17,6 +11,7 @@ public class Main {
     private static ServicoDAO servicoDAO = new ServicoDAO();
     private static ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
     private static VeiculoDAO veiculoDAO = new VeiculoDAO();
+    private static OrdemServicoDAO ordemServicoDAO = new OrdemServicoDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -29,17 +24,19 @@ public class Main {
             System.out.println("2. Gestão de Serviços");
             System.out.println("3. Gestão de Colaboradores");
             System.out.println("4. Gestão de Veículos");
+            System.out.println("5. Gestão de Ordens de Serviço (O.S.)");
             System.out.println("0. Sair do Sistema");
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar o buffer do teclado
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> menuClientes();
                 case 2 -> menuServicos();
                 case 3 -> menuColaboradores();
                 case 4 -> menuVeiculos();
+                case 5 -> menuOrdensServico();
                 case 0 -> System.out.println("Encerrando o sistema... Até logo!");
                 default -> System.out.println("Opção inválida! Tente novamente.");
             }
@@ -59,7 +56,6 @@ public class Main {
             }
         }
 
-        // 2. VALIDAÇÃO DO CPF
         String cpf = "";
         while (cpf.trim().isEmpty()) {
             System.out.print("CPF (Obrigatório): ");
@@ -69,13 +65,11 @@ public class Main {
             }
         }
 
-        // 3. CAMPOS OPCIONAIS (Pode dar Enter em branco)
         System.out.print("Telefone: ");
         String telefone = scanner.nextLine();
         System.out.print("E-mail: ");
         String email = scanner.nextLine();
 
-        // Criando e salvando o objeto se tudo estiver OK
         Cliente novoCliente = new Cliente();
         novoCliente.setNome(nome);
         novoCliente.setCpf(cpf);
@@ -131,7 +125,6 @@ public class Main {
         Long id = scanner.nextLong();
         scanner.nextLine(); // Limpar buffer
 
-        // 1. VALIDAÇÃO DO NOVO NOME
         String nome = "";
         while (nome.trim().isEmpty()) {
             System.out.print("Novo Nome (Obrigatório): ");
@@ -141,7 +134,6 @@ public class Main {
             }
         }
 
-        // 2. VALIDAÇÃO DO NOVO CPF
         String cpf = "";
         while (cpf.trim().isEmpty()) {
             System.out.print("Novo CPF (Obrigatório): ");
@@ -151,13 +143,11 @@ public class Main {
             }
         }
 
-        // 3. CAMPOS OPCIONAIS
         System.out.print("Novo Telefone: ");
         String telefone = scanner.nextLine();
         System.out.print("Novo E-mail: ");
         String email = scanner.nextLine();
 
-        // Montando o objeto atualizado
         Cliente clienteAtualizado = new Cliente();
         clienteAtualizado.setId(id);
         clienteAtualizado.setNome(nome);
@@ -584,5 +574,130 @@ public class Main {
         scanner.nextLine(); // Limpar buffer
 
         veiculoDAO.excluir(id);
+    }
+    private static void menuOrdensServico() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MÓDULO: GESTÃO DE ORDENS DE SERVIÇO ---");
+            System.out.println("1. Abrir Nova O.S. (Checklist de Entrada)");
+            System.out.println("2. Listar Todas as O.S.");
+            System.out.println("3. Cancelar Ordem de Serviço");
+            System.out.println("4. Buscar O.S. (Nº, Situação ou Data)"); // <-- Nova opção!
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+
+            switch (opcao) {
+                case 1 -> abrirOrdemServico();
+                case 2 -> listarOrdensServico();
+                case 3 -> cancelarOrdemServico();
+                case 4 -> buscarOrdemServico(); // <-- Nova chamada!
+                case 0 -> System.out.println("Voltando ao menu principal...");
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private static void abrirOrdemServico() {
+        System.out.println("\n--- ABERTURA DE ORDEM DE SERVIÇO ---");
+        System.out.print("Número da O.S. (ex: 1011): ");
+        int numeroOs = scanner.nextInt();
+        scanner.nextLine(); // Limpar buffer
+
+        // Relacionamentos Obrigatórios
+        System.out.print("ID do Cliente: ");
+        long clienteId = scanner.nextLong();
+        System.out.print("ID do Veículo: ");
+        long veiculoId = scanner.nextLong();
+        System.out.print("ID do Colaborador (Mecânico Responsável): ");
+        long colaboradorId = scanner.nextLong();
+        scanner.nextLine(); // Limpar buffer
+
+        // --- CHECKLIST DE ENTRADA DO VEÍCULO ---
+        System.out.println("\n--- CHECKLIST DE ENTRADA (Responda 1 para SIM, 0 para NÃO) ---");
+        System.out.print("Possui Estepe? ");
+        boolean chkEstepe = scanner.nextInt() == 1;
+        System.out.print("Possui Macaco e Chave de Roda? ");
+        boolean chkMacaco = scanner.nextInt() == 1;
+        System.out.print("Possui Triângulo? ");
+        boolean chkTriangulo = scanner.nextInt() == 1;
+        System.out.print("Possui Rádio/Multimídia? ");
+        boolean chkRadio = scanner.nextInt() == 1;
+        scanner.nextLine(); // Limpar buffer
+
+        System.out.print("Nível de Combustível (ex: CHEIO, MEIO_TANQUE, RESERVA): ");
+        String combustivel = scanner.nextLine().toUpperCase();
+
+        System.out.print("Observações / Avarias Visíveis: ");
+        String avarias = scanner.nextLine();
+
+        // Montando o Objeto O.S.
+        OrdemServico novaOs = new OrdemServico();
+        novaOs.setNumeroOs(numeroOs);
+        novaOs.setSituacao("ABERTA");
+        novaOs.setDataAbertura(new java.sql.Timestamp(System.currentTimeMillis()));
+
+        novaOs.setClienteId(clienteId);
+        novaOs.setVeiculoId(veiculoId);
+        novaOs.setAbertoPorColaboradorId(colaboradorId);
+
+        novaOs.setChkEstepe(chkEstepe);
+        novaOs.setChkMacacoChaveRoda(chkMacaco);
+        novaOs.setChkTriangulo(chkTriangulo);
+        novaOs.setChkRadio(chkRadio);
+        novaOs.setChkNivelCombustivel(combustivel);
+        novaOs.setChkObservacoesAvarias(avarias);
+
+        novaOs.setValorTotalServicos(0.0);
+        novaOs.setValorTotalPecas(0.0);
+        novaOs.setValorTotalGeral(0.0);
+
+        ordemServicoDAO.cadastrar(novaOs);
+    }
+
+    private static void listarOrdensServico() {
+        System.out.println("\n--- LISTA DE ORDENS DE SERVIÇO ---");
+        List<OrdemServico> lista = ordemServicoDAO.listarTodas();
+
+        if (lista.isEmpty()) {
+            System.out.println("Nenhuma O.S. cadastrada.");
+        } else {
+            for (OrdemServico os : lista) {
+                System.out.printf("ID: %d | Nº O.S.: %d | Situação: %s | Data Abertura: %s | Cliente ID: %d | Veículo ID: %d | Total: R$ %.2f\n",
+                        os.getId(), os.getNumeroOs(), os.getSituacao(), os.getDataAbertura(), os.getClienteId(), os.getVeiculoId(), os.getValorTotalGeral());
+            }
+        }
+    }
+
+    private static void cancelarOrdemServico() {
+        System.out.println("\n--- CANCELAR ORDEM DE SERVIÇO ---");
+        System.out.print("Digite o ID da Ordem de Serviço que deseja cancelar: ");
+        long id = scanner.nextLong();
+        scanner.nextLine(); // Limpar buffer
+
+        System.out.print("Digite o motivo do cancelamento (Obrigatório): ");
+        String motivo = scanner.nextLine();
+
+        ordemServicoDAO.processarCancelamento(id, motivo);
+    }
+
+    private static void buscarOrdemServico() {
+        System.out.println("\n--- BUSCAR ORDEM DE SERVIÇO ---");
+        System.out.print("Digite o número da O.S., a situação ou parte da data (AAAA-MM-DD): ");
+        String termo = scanner.nextLine();
+
+        List<OrdemServico> resultados = ordemServicoDAO.buscarPorTermo(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhuma Ordem de Serviço encontrada com esse termo.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (OrdemServico os : resultados) {
+                System.out.printf("ID: %d | Nº O.S.: %d | Situação: %s | Data Abertura: %s | Total: R$ %.2f\n",
+                        os.getId(), os.getNumeroOs(), os.getSituacao(), os.getDataAbertura(), os.getValorTotalGeral());
+            }
+        }
     }
 }
