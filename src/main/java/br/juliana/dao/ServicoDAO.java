@@ -109,4 +109,28 @@ public class ServicoDAO {
             System.err.println("Erro ao excluir serviço: " + e.getMessage());
         }
     }
+    // 5. BUSCAR SERVIÇO POR DESCRIÇÃO (OU PARTE DELA)
+    public List<Servico> buscarPorDescricao(String termoBusca) {
+        List<Servico> lista = new ArrayList<>();
+        String sql = "SELECT * FROM servicos WHERE LOWER(descricao) LIKE LOWER(?)";
+
+        try (Connection conn = FabricaConexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + termoBusca.trim() + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Servico s = new Servico();
+                    s.setId(rs.getLong("id"));
+                    s.setDescricao(rs.getString("descricao"));
+                    s.setPrecoTabela(rs.getDouble("preco_tabela"));
+                    lista.add(s);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar serviços: " + e.getMessage());
+        }
+        return lista;
+    }
 }

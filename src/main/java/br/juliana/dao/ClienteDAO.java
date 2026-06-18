@@ -92,4 +92,30 @@ public class ClienteDAO {
             System.err.println("Erro ao excluir cliente: " + e.getMessage());
         }
     }
+    // 5. BUSCAR CLIENTE POR NOME (OU PARTE DO NOME)
+    public List<Cliente> buscarPorNome(String nomeBusca) {
+        List<Cliente> lista = new ArrayList<>();
+        String sql = "SELECT * FROM clientes WHERE LOWER(nome) LIKE LOWER(?)";
+
+        try (Connection conn = FabricaConexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + nomeBusca.trim() + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Cliente c = new Cliente();
+                    c.setId(rs.getLong("id"));
+                    c.setNome(rs.getString("nome"));
+                    c.setCpf(rs.getString("cpf"));
+                    c.setTelefone(rs.getString("telefone"));
+                    c.setEmail(rs.getString("email"));
+                    lista.add(c);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar clientes: " + e.getMessage());
+        }
+        return lista;
+    }
 }

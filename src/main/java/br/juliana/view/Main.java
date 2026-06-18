@@ -1,8 +1,10 @@
 package br.juliana.view;
 
 import br.juliana.dao.ClienteDAO;
+import br.juliana.dao.ColaboradorDAO;
 import br.juliana.dao.ServicoDAO;
 import br.juliana.model.Cliente;
+import br.juliana.model.Colaborador;
 import br.juliana.model.Servico;
 
 import java.util.Scanner;
@@ -11,6 +13,7 @@ import java.util.List;
 public class Main {
     private static ClienteDAO clienteDAO = new ClienteDAO();
     private static ServicoDAO servicoDAO = new ServicoDAO();
+    private static ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -21,6 +24,7 @@ public class Main {
             System.out.println("Escolha o módulo desejado:");
             System.out.println("1. Gestão de Clientes");
             System.out.println("2. Gestão de Serviços");
+            System.out.println("3. Gestão de Colaboradores");
             System.out.println("0. Sair do Sistema");
             System.out.print("Escolha uma opção: ");
 
@@ -30,6 +34,7 @@ public class Main {
             switch (opcao) {
                 case 1 -> menuClientes();
                 case 2 -> menuServicos();
+                case 3 -> menuColaboradores();
                 case 0 -> System.out.println("Encerrando o sistema... Até logo!");
                 default -> System.out.println("Opção inválida! Tente novamente.");
             }
@@ -81,8 +86,9 @@ public class Main {
             System.out.println("\n--- MÓDULO: GESTÃO DE CLIENTES ---");
             System.out.println("1. Cadastrar Cliente");
             System.out.println("2. Listar Clientes");
-            System.out.println("3. Atualizar Cliente");
-            System.out.println("4. Excluir Cliente");
+            System.out.println("3. Buscar Cliente por Nome");
+            System.out.println("4. Atualizar Cliente");
+            System.out.println("5. Excluir Cliente");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
 
@@ -92,8 +98,9 @@ public class Main {
             switch (opcao) {
                 case 1 -> cadastrarCliente();
                 case 2 -> listarClientes();
-                case 3 -> atualizarCliente();
-                case 4 -> excluirCliente();
+                case 3 -> buscarCliente();
+                case 4 -> atualizarCliente();
+                case 5 -> excluirCliente();
                 case 0 -> System.out.println("Voltando ao menu anterior...");
                 default -> System.out.println("Opção inválida!");
             }
@@ -169,8 +176,9 @@ public class Main {
             System.out.println("\n--- GESTÃO DE SERVIÇOS ---");
             System.out.println("1. Cadastrar Serviço");
             System.out.println("2. Listar Serviços");
-            System.out.println("3. Atualizar Serviço");
-            System.out.println("4. Excluir Serviço");
+            System.out.println("3. Buscar Serviço");
+            System.out.println("4. Atualizar Serviço");
+            System.out.println("5. Excluir Serviço");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
@@ -179,8 +187,9 @@ public class Main {
             switch (opcao) {
                 case 1 -> cadastrarServico();
                 case 2 -> listarServicos();
-                case 3 -> atualizarServico();
-                case 4 -> excluirServico();
+                case 3 -> buscarServico();
+                case 4 -> atualizarServico();
+                case 5 -> excluirServico();
                 case 0 -> System.out.println("Voltando ao menu principal...");
                 default -> System.out.println("Opção inválida!");
             }
@@ -278,5 +287,175 @@ public class Main {
         scanner.nextLine();
 
         servicoDAO.excluir(id);
+    }
+    private static void menuColaboradores() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MÓDULO: GESTÃO DE COLABORADORES ---");
+            System.out.println("1. Cadastrar Colaborador");
+            System.out.println("2. Listar Colaboradores");
+            System.out.println("3. Buscar Colaborador por Nome");
+            System.out.println("4. Atualizar Colaborador");
+            System.out.println("5. Excluir Colaborador");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+
+            switch (opcao) {
+                case 1 -> cadastrarColaborador();
+                case 2 -> listarColaboradores();
+                case 3 -> buscarColaborador();
+                case 4 -> atualizarColaborador();
+                case 5 -> excluirColaborador();
+                case 0 -> System.out.println("Voltando ao menu anterior...");
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private static void cadastrarColaborador() {
+        System.out.println("\n--- NOVO COLABORADOR ---");
+
+        String nome = "";
+        while (nome.trim().isEmpty()) {
+            System.out.print("Nome (Obrigatório): ");
+            nome = scanner.nextLine();
+            if (nome.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Nome é de preenchimento obrigatório!");
+            }
+        }
+
+        String cargo = "";
+        while (cargo.trim().isEmpty()) {
+            System.out.print("Cargo (Obrigatório - ex: Mecânico, Alinhador): ");
+            cargo = scanner.nextLine();
+            if (cargo.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Cargo é de preenchimento obrigatório!");
+            }
+        }
+
+        System.out.print("Especialidade (Opcional - ex: Injeção Eletrônica, Suspensão): ");
+        String especialidade = scanner.nextLine();
+
+        Colaborador c = new Colaborador();
+        c.setNome(nome);
+        c.setCargo(cargo);
+        c.setEspecialidade(especialidade);
+
+        colaboradorDAO.cadastrar(c);
+    }
+
+    private static void listarColaboradores() {
+        System.out.println("\n--- LISTA DE COLABORADORES ---");
+        List<Colaborador> lista = colaboradorDAO.listarTodos();
+        if (lista.isEmpty()) {
+            System.out.println("Nenhum colaborador cadastrado.");
+        } else {
+            for (Colaborador c : lista) {
+                System.out.printf("ID: %d | Nome: %s | Cargo: %s | Especialidade: %s\n",
+                        c.getId(), c.getNome(), c.getCargo(), c.getEspecialidade());
+            }
+        }
+    }
+
+    private static void atualizarColaborador() {
+        System.out.println("\n--- ATUALIZAR COLABORADOR ---");
+        System.out.print("Digite o ID do colaborador que deseja alterar: ");
+        Long id = scanner.nextLong();
+        scanner.nextLine();
+
+        String nome = "";
+        while (nome.trim().isEmpty()) {
+            System.out.print("Novo Nome (Obrigatório): ");
+            nome = scanner.nextLine();
+            if (nome.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Nome é de preenchimento obrigatório!");
+            }
+        }
+
+        String cargo = "";
+        while (cargo.trim().isEmpty()) {
+            System.out.print("Novo Cargo (Obrigatório): ");
+            cargo = scanner.nextLine();
+            if (cargo.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Cargo é de preenchimento obrigatório!");
+            }
+        }
+
+        System.out.print("Nova Especialidade (Opcional): ");
+        String especialidade = scanner.nextLine();
+
+        Colaborador c = new Colaborador();
+        c.setId(id);
+        c.setNome(nome);
+        c.setCargo(cargo);
+        c.setEspecialidade(especialidade);
+
+        colaboradorDAO.atualizar(c);
+    }
+
+    private static void excluirColaborador() {
+        System.out.println("\n--- EXCLUIR COLABORADOR ---");
+        System.out.print("Digite o ID do colaborador que deseja remover: ");
+        Long id = scanner.nextLong();
+        scanner.nextLine();
+
+        colaboradorDAO.excluir(id);
+    }
+    private static void buscarColaborador() {
+        System.out.println("\n--- BUSCAR COLABORADOR ---");
+        System.out.print("Digite o nome ou parte do nome: ");
+        String termo = scanner.nextLine();
+
+        List<Colaborador> resultados = colaboradorDAO.buscarPorNome(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum colaborador encontrado com esse termo.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Colaborador c : resultados) {
+                System.out.printf("ID: %d | Nome: %s | Cargo: %s | Especialidade: %s\n",
+                        c.getId(), c.getNome(), c.getCargo(), c.getEspecialidade());
+            }
+        }
+    }
+    private static void buscarCliente() {
+        System.out.println("\n--- BUSCAR CLIENTE ---");
+        System.out.print("Digite o nome ou parte do nome do cliente: ");
+        String termo = scanner.nextLine();
+
+        List<Cliente> resultados = clienteDAO.buscarPorNome(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum cliente encontrado com esse termo.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Cliente c : resultados) {
+                System.out.printf("ID: %d | Nome: %s | CPF: %s | Telefone: %s\n",
+                        c.getId(), c.getNome(), c.getCpf(), c.getTelefone());
+            }
+        }
+    }
+
+    private static void buscarServico() {
+        System.out.println("\n--- BUSCAR SERVIÇO ---");
+        // Mensagem clara para o usuário saber que pode digitar qualquer um dos três!
+        System.out.print("Digite a descrição, parte dela ou o preço exato: ");
+        String termo = scanner.nextLine();
+
+        // Chama o método do DAO que faz a busca dupla
+        List<Servico> resultados = servicoDAO.buscarPorDescricao(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum serviço encontrado com esse termo ou preço.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Servico s : resultados) {
+                System.out.printf("ID: %d | Descrição: %s | Preço: R$ %.2f\n",
+                        s.getId(), s.getDescricao(), s.getPrecoTabela());
+            }
+        }
     }
 }
