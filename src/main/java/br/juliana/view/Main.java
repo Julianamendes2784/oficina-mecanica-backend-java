@@ -49,16 +49,34 @@ public class Main {
 
     private static void cadastrarCliente() {
         System.out.println("\n--- NOVO CADASTRO ---");
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
+
+        // 1. VALIDAÇÃO DO NOME
+        String nome = "";
+        while (nome.trim().isEmpty()) {
+            System.out.print("Nome (Obrigatório): ");
+            nome = scanner.nextLine();
+            if (nome.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Nome é de preenchimento obrigatório!");
+            }
+        }
+
+        // 2. VALIDAÇÃO DO CPF
+        String cpf = "";
+        while (cpf.trim().isEmpty()) {
+            System.out.print("CPF (Obrigatório): ");
+            cpf = scanner.nextLine();
+            if (cpf.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo CPF é de preenchimento obrigatório!");
+            }
+        }
+
+        // 3. CAMPOS OPCIONAIS (Pode dar Enter em branco)
         System.out.print("Telefone: ");
         String telefone = scanner.nextLine();
         System.out.print("E-mail: ");
         String email = scanner.nextLine();
 
-        // Usando construtor padrão vazio e adicionando com os setters para não dar erro
+        // Criando e salvando o objeto se tudo estiver OK
         Cliente novoCliente = new Cliente();
         novoCliente.setNome(nome);
         novoCliente.setCpf(cpf);
@@ -88,15 +106,33 @@ public class Main {
         Long id = scanner.nextLong();
         scanner.nextLine(); // Limpar buffer
 
-        System.out.print("Novo Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("Novo CPF: ");
-        String cpf = scanner.nextLine();
+        // 1. VALIDAÇÃO DO NOVO NOME
+        String nome = "";
+        while (nome.trim().isEmpty()) {
+            System.out.print("Novo Nome (Obrigatório): ");
+            nome = scanner.nextLine();
+            if (nome.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Nome é de preenchimento obrigatório!");
+            }
+        }
+
+        // 2. VALIDAÇÃO DO NOVO CPF
+        String cpf = "";
+        while (cpf.trim().isEmpty()) {
+            System.out.print("Novo CPF (Obrigatório): ");
+            cpf = scanner.nextLine();
+            if (cpf.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo CPF é de preenchimento obrigatório!");
+            }
+        }
+
+        // 3. CAMPOS OPCIONAIS
         System.out.print("Novo Telefone: ");
         String telefone = scanner.nextLine();
         System.out.print("Novo E-mail: ");
         String email = scanner.nextLine();
 
+        // Montando o objeto atualizado
         Cliente clienteAtualizado = new Cliente();
         clienteAtualizado.setId(id);
         clienteAtualizado.setNome(nome);
