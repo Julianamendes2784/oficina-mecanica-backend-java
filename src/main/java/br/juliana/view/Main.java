@@ -3,9 +3,11 @@ package br.juliana.view;
 import br.juliana.dao.ClienteDAO;
 import br.juliana.dao.ColaboradorDAO;
 import br.juliana.dao.ServicoDAO;
+import br.juliana.dao.VeiculoDAO;
 import br.juliana.model.Cliente;
 import br.juliana.model.Colaborador;
 import br.juliana.model.Servico;
+import br.juliana.model.Veiculo;
 
 import java.util.Scanner;
 import java.util.List;
@@ -14,6 +16,7 @@ public class Main {
     private static ClienteDAO clienteDAO = new ClienteDAO();
     private static ServicoDAO servicoDAO = new ServicoDAO();
     private static ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
+    private static VeiculoDAO veiculoDAO = new VeiculoDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -25,6 +28,7 @@ public class Main {
             System.out.println("1. Gestão de Clientes");
             System.out.println("2. Gestão de Serviços");
             System.out.println("3. Gestão de Colaboradores");
+            System.out.println("4. Gestão de Veículos");
             System.out.println("0. Sair do Sistema");
             System.out.print("Escolha uma opção: ");
 
@@ -35,6 +39,7 @@ public class Main {
                 case 1 -> menuClientes();
                 case 2 -> menuServicos();
                 case 3 -> menuColaboradores();
+                case 4 -> menuVeiculos();
                 case 0 -> System.out.println("Encerrando o sistema... Até logo!");
                 default -> System.out.println("Opção inválida! Tente novamente.");
             }
@@ -457,5 +462,127 @@ public class Main {
                         s.getId(), s.getDescricao(), s.getPrecoTabela());
             }
         }
+    }
+    private static void menuVeiculos() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MÓDULO: GESTÃO DE VEÍCULOS ---");
+            System.out.println("1. Cadastrar Veículo");
+            System.out.println("2. Listar Veículos");
+            System.out.println("3. Buscar Veículo por Placa ou Modelo");
+            System.out.println("4. Atualizar Veículo");
+            System.out.println("5. Excluir Veículo");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+
+            switch (opcao) {
+                case 1 -> cadastrarVeiculo();
+                case 2 -> listarVeiculos();
+                case 3 -> buscarVeiculo();
+                case 4 -> atualizarVeiculo();
+                case 5 -> excluirVeiculo();
+                case 0 -> System.out.println("Voltando ao menu principal...");
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private static void cadastrarVeiculo() {
+        System.out.println("\n--- NOVO VEÍCULO ---");
+        System.out.print("Placa (Obrigatório): ");
+        String placa = scanner.nextLine();
+        System.out.print("Modelo (Obrigatório): ");
+        String modelo = scanner.nextLine();
+        System.out.print("Ano: ");
+        int ano = scanner.nextInt();
+        scanner.nextLine(); // Limpar buffer
+        System.out.print("Cor: ");
+        String cor = scanner.nextLine();
+        System.out.print("Quilometragem: ");
+        int quilometragem = scanner.nextInt();
+        System.out.print("ID do Cliente Proprietário (Obrigatório): ");
+        long clienteId = scanner.nextLong();
+        scanner.nextLine(); // Limpar buffer
+
+        Veiculo novoVeiculo = new Veiculo();
+        novoVeiculo.setPlaca(placa);
+        novoVeiculo.setModelo(modelo);
+        novoVeiculo.setAno(ano);
+        novoVeiculo.setCor(cor);
+        novoVeiculo.setQuilometragem(quilometragem);
+        novoVeiculo.setClienteId(clienteId);
+
+        veiculoDAO.cadastrar(novoVeiculo);
+    }
+
+    private static void listarVeiculos() {
+        System.out.println("\n--- LISTA DE VEÍCULOS ---");
+        List<Veiculo> lista = veiculoDAO.listarTodos();
+
+        if (lista.isEmpty()) {
+            System.out.println("Nenhum veículo cadastrado.");
+        } else {
+            for (Veiculo v : lista) {
+                System.out.printf("ID: %d | Placa: %s | Modelo: %s | Ano: %d | Cor: %s | KM: %d | Cliente ID: %d\n",
+                        v.getId(), v.getPlaca(), v.getModelo(), v.getAno(), v.getCor(), v.getQuilometragem(), v.getClienteId());
+            }
+        }
+    }
+
+    private static void buscarVeiculo() {
+        System.out.println("\n--- BUSCAR VEÍCULO ---");
+        System.out.print("Digite a placa ou o modelo do veículo: ");
+        String termo = scanner.nextLine();
+
+        List<Veiculo> resultados = veiculoDAO.buscarPorTermo(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum veículo encontrado com esse termo.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Veiculo v : resultados) {
+                System.out.printf("ID: %d | Placa: %s | Modelo: %s | Ano: %d | Cor: %s | Cliente ID: %d\n",
+                        v.getId(), v.getPlaca(), v.getModelo(), v.getAno(), v.getCor(), v.getClienteId());
+            }
+        }
+    }
+
+    private static void atualizarVeiculo() {
+        System.out.println("\n--- ATUALIZAR VEÍCULO ---");
+        System.out.print("Digite o ID do veículo que deseja atualizar: ");
+        long id = scanner.nextLong();
+        scanner.nextLine(); // Limpar buffer
+
+        System.out.print("Novo Modelo: ");
+        String modelo = scanner.nextLine();
+        System.out.print("Novo Ano: ");
+        int ano = scanner.nextInt();
+        scanner.nextLine(); // Limpar buffer
+        System.out.print("Nova Cor: ");
+        String cor = scanner.nextLine();
+        System.out.print("Nova Quilometragem: ");
+        int quilometragem = scanner.nextInt();
+        scanner.nextLine(); // Limpar buffer
+
+        Veiculo veiculoAtualizado = new Veiculo();
+        veiculoAtualizado.setId(id);
+        veiculoAtualizado.setModelo(modelo);
+        veiculoAtualizado.setAno(ano);
+        veiculoAtualizado.setCor(cor);
+        veiculoAtualizado.setQuilometragem(quilometragem);
+
+        veiculoDAO.atualizar(veiculoAtualizado);
+    }
+
+    private static void excluirVeiculo() {
+        System.out.println("\n--- EXCLUIR VEÍCULO ---");
+        System.out.print("Digite o ID do veículo que deseja deletar: ");
+        long id = scanner.nextLong();
+        scanner.nextLine(); // Limpar buffer
+
+        veiculoDAO.excluir(id);
     }
 }
