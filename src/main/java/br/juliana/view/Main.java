@@ -2,10 +2,12 @@ package br.juliana.view;
 
 import br.juliana.dao.ClienteDAO;
 import br.juliana.dao.ColaboradorDAO;
+import br.juliana.dao.PecaDAO;
 import br.juliana.dao.ServicoDAO;
 import br.juliana.dao.VeiculoDAO;
 import br.juliana.model.Cliente;
 import br.juliana.model.Colaborador;
+import br.juliana.model.Peca;
 import br.juliana.model.Servico;
 import br.juliana.model.Veiculo;
 
@@ -17,6 +19,7 @@ public class Main {
     private static ServicoDAO servicoDAO = new ServicoDAO();
     private static ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
     private static VeiculoDAO veiculoDAO = new VeiculoDAO();
+    private static PecaDAO pecaDAO = new PecaDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -29,6 +32,7 @@ public class Main {
             System.out.println("2. Gestão de Serviços");
             System.out.println("3. Gestão de Colaboradores");
             System.out.println("4. Gestão de Veículos");
+            System.out.println("5. Gestão de Peças");
             System.out.println("0. Sair do Sistema");
             System.out.print("Escolha uma opção: ");
 
@@ -40,6 +44,7 @@ public class Main {
                 case 2 -> menuServicos();
                 case 3 -> menuColaboradores();
                 case 4 -> menuVeiculos();
+                case 5 -> menuPecas();
                 case 0 -> System.out.println("Encerrando o sistema... Até logo!");
                 default -> System.out.println("Opção inválida! Tente novamente.");
             }
@@ -584,5 +589,145 @@ public class Main {
         scanner.nextLine(); // Limpar buffer
 
         veiculoDAO.excluir(id);
+    }
+
+    // ================= GESTÃO DE PEÇAS =================
+    private static void menuPecas() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MÓDULO: GESTÃO DE PEÇAS ---");
+            System.out.println("1. Cadastrar Peça");
+            System.out.println("2. Listar Peças");
+            System.out.println("3. Buscar Peça por ID");
+            System.out.println("4. Atualizar Peça");
+            System.out.println("5. Excluir Peça");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+
+            switch (opcao) {
+                case 1 -> cadastrarPeca();
+                case 2 -> listarPecas();
+                case 3 -> buscarPeca();
+                case 4 -> atualizarPeca();
+                case 5 -> excluirPeca();
+                case 0 -> System.out.println("Voltando ao menu principal...");
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private static void cadastrarPeca() {
+        System.out.println("\n--- NOVA PEÇA ---");
+
+        String nome = "";
+        while (nome.trim().isEmpty()) {
+            System.out.print("Nome (Obrigatório): ");
+            nome = scanner.nextLine();
+            if (nome.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Nome é de preenchimento obrigatório!");
+            }
+        }
+
+        Double precoVenda = null;
+        while (precoVenda == null) {
+            System.out.print("Preço de Venda (Obrigatório): ");
+            String entradaPreco = scanner.nextLine();
+            if (entradaPreco.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Preço é de preenchimento obrigatório!");
+            } else {
+                try {
+                    precoVenda = Double.parseDouble(entradaPreco.replace(",", "."));
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠️ Erro: Digite um preço numérico válido (Ex: 150.00)!");
+                }
+            }
+        }
+
+        System.out.print("Estoque: ");
+        int estoque = scanner.nextInt();
+        scanner.nextLine();
+
+        Peca novaPeca = new Peca(nome, precoVenda, estoque);
+        pecaDAO.cadastrar(novaPeca);
+    }
+
+    private static void listarPecas() {
+        System.out.println("\n--- LISTA DE PEÇAS ---");
+        List<Peca> lista = pecaDAO.listarTodos();
+
+        if (lista.isEmpty()) {
+            System.out.println("Nenhuma peça cadastrada.");
+        } else {
+            for (Peca p : lista) {
+                System.out.printf("ID: %d | Nome: %s | Preço: R$ %.2f | Estoque: %d\n",
+                        p.getId(), p.getNome(), p.getPrecoVenda(), p.getEstoque());
+            }
+        }
+    }
+
+    private static void buscarPeca() {
+        System.out.println("\n--- BUSCAR PEÇA ---");
+        System.out.print("Digite o ID da peça: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Peca encontrada = pecaDAO.buscarPorId(id);
+
+        if (encontrada != null) {
+            System.out.printf("ID: %d | Nome: %s | Preço: R$ %.2f | Estoque: %d\n",
+                    encontrada.getId(), encontrada.getNome(), encontrada.getPrecoVenda(), encontrada.getEstoque());
+        } else {
+            System.out.println("❌ Peça não encontrada.");
+        }
+    }
+
+    private static void atualizarPeca() {
+        System.out.println("\n--- ATUALIZAR PEÇA ---");
+        System.out.print("Digite o ID da peça que deseja alterar: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        String nome = "";
+        while (nome.trim().isEmpty()) {
+            System.out.print("Novo Nome (Obrigatório): ");
+            nome = scanner.nextLine();
+            if (nome.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Nome é de preenchimento obrigatório!");
+            }
+        }
+
+        Double precoVenda = null;
+        while (precoVenda == null) {
+            System.out.print("Novo Preço de Venda (Obrigatório): ");
+            String entradaPreco = scanner.nextLine();
+            if (entradaPreco.trim().isEmpty()) {
+                System.out.println("⚠️ Alerta: O campo Preço é de preenchimento obrigatório!");
+            } else {
+                try {
+                    precoVenda = Double.parseDouble(entradaPreco.replace(",", "."));
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠️ Erro: Digite um preço numérico válido!");
+                }
+            }
+        }
+
+        System.out.print("Nova Quantidade em Estoque: ");
+        int estoque = scanner.nextInt();
+        scanner.nextLine();
+
+        Peca pecaAtualizada = new Peca(id, nome, precoVenda, estoque);
+        pecaDAO.atualizar(pecaAtualizada);
+    }
+
+    private static void excluirPeca() {
+        System.out.println("\n--- EXCLUIR PEÇA ---");
+        System.out.print("Digite o ID da peça que deseja remover: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        pecaDAO.excluir(id);
     }
 }
