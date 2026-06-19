@@ -165,4 +165,36 @@ public class OrdemServicoDAO {
         }
         return lista;
     }
+    // 5. BUSCA POR PERÍODO DE DATAS (Data Inicial e Data Final)
+    public List<OrdemServico> buscarPorPeriodo(String dataInicio, String dataFim) {
+        List<OrdemServico> lista = new ArrayList<>();
+
+        // SQL usando BETWEEN para pegar tudo o que estiver entre o início e o fim do período (ajustando o horário para cobrir o dia todo)
+        String sql = "SELECT * FROM ordens_servico WHERE data_abertura BETWEEN ? AND ?";
+
+        try (Connection conn = FabricaConexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Adiciona o horário de início (00:00:00) e fim (23:59:59) para garantir que pegue o dia cheio
+            stmt.setString(1, dataInicio.trim() + " 00:00:00");
+            stmt.setString(2, dataFim.trim() + " 23:59:59");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    OrdemServico os = new OrdemServico();
+                    os.setId(rs.getLong("id"));
+                    os.setNumeroOs(rs.getInt("numero_os"));
+                    os.setSituacao(rs.getString("situacao"));
+                    os.setDataAbertura(rs.getTimestamp("data_abertura"));
+                    os.setClienteId(rs.getLong("cliente_id"));
+                    os.setVeiculoId(rs.getLong("veiculo_id"));
+                    os.setValorTotalGeral(rs.getDouble("valor_total_geral"));
+                    lista.add(os);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar Ordens de Serviço por período: " + e.getMessage());
+        }
+        return lista;
+    }
 }

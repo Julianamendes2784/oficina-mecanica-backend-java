@@ -3,6 +3,7 @@ package br.juliana.view;
 import br.juliana.dao.*;
 import br.juliana.model.*;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class Main {
         int opcao = -1;
 
         while (opcao != 0) {
-            System.out.println("\n--- SISTEMA OFICINA MECÂNICA ---");
+            System.out.println("\n--- MecControl - Sistema de Gerenciamento de Oficina Mecânica ---");
             System.out.println("Escolha o módulo desejado:");
             System.out.println("1. Gestão de Clientes");
             System.out.println("2. Gestão de Serviços");
@@ -582,18 +583,25 @@ public class Main {
             System.out.println("1. Abrir Nova O.S. (Checklist de Entrada)");
             System.out.println("2. Listar Todas as O.S.");
             System.out.println("3. Cancelar Ordem de Serviço");
-            System.out.println("4. Buscar O.S. (Nº, Situação ou Data)"); // <-- Nova opção!
+            System.out.println("4. Buscar O.S. (Nº, Situação ou Data)");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
 
-            opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            try {
+                opcao = scanner.nextInt();
+                scanner.nextLine();
+            } catch (Exception e) {
+                System.out.println("❌ Opção inválida! Digite um número do menu.");
+                scanner.nextLine();
+                opcao = -1;
+                continue;
+            }
 
             switch (opcao) {
                 case 1 -> abrirOrdemServico();
                 case 2 -> listarOrdensServico();
                 case 3 -> cancelarOrdemServico();
-                case 4 -> buscarOrdemServico(); // <-- Nova chamada!
+                case 4 -> buscarOrdemServico();
                 case 0 -> System.out.println("Voltando ao menu principal...");
                 default -> System.out.println("Opção inválida!");
             }
@@ -604,9 +612,9 @@ public class Main {
         System.out.println("\n--- ABERTURA DE ORDEM DE SERVIÇO ---");
         System.out.print("Número da O.S. (ex: 1011): ");
         int numeroOs = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
-        // Relacionamentos Obrigatórios
+
         System.out.print("ID do Cliente: ");
         long clienteId = scanner.nextLong();
         System.out.print("ID do Veículo: ");
@@ -685,13 +693,42 @@ public class Main {
 
     private static void buscarOrdemServico() {
         System.out.println("\n--- BUSCAR ORDEM DE SERVIÇO ---");
-        System.out.print("Digite o número da O.S., a situação ou parte da data (AAAA-MM-DD): ");
-        String termo = scanner.nextLine();
+        System.out.println("1. Buscar por Número da O.S. ou Situação");
+        System.out.println("2. Filtrar por Período de Datas");
+        System.out.print("Escolha o tipo de busca: ");
 
-        List<OrdemServico> resultados = ordemServicoDAO.buscarPorTermo(termo);
+        int tipoSubBusca = 0;
+        try {
+            tipoSubBusca = scanner.nextInt();
+            scanner.nextLine(); // Limpar buffer
+        } catch (Exception e) {
+            System.out.println("❌ Erro: Digite apenas o número da opção desejada!");
+            scanner.nextLine(); // Limpa o buffer que ficou sujo com a digitação errada
+            return; // Encerra o método com segurança e volta para o menu
+        }
 
+        List<OrdemServico> resultados = new ArrayList<>();
+        // ... o restante do método (if / else if) continua exatamente igual ...
+
+        if (tipoSubBusca == 1) {
+            System.out.print("Digite o número da O.S. ou a situação: ");
+            String termo = scanner.nextLine();
+            resultados = ordemServicoDAO.buscarPorTermo(termo);
+        } else if (tipoSubBusca == 2) {
+            System.out.print("Digite a Data Inicial (Formato: AAAA-MM-DD, ex: 2026-06-01): ");
+            String dataInicio = scanner.nextLine();
+            System.out.print("Digite a Data Final (Formato: AAAA-MM-DD, ex: 2026-06-08): ");
+            String dataFim = scanner.nextLine();
+
+            resultados = ordemServicoDAO.buscarPorPeriodo(dataInicio, dataFim);
+        } else {
+            System.out.println("Opção inválida!");
+            return;
+        }
+
+        // Exibição dos resultados encontrados
         if (resultados.isEmpty()) {
-            System.out.println("❌ Nenhuma Ordem de Serviço encontrada com esse termo.");
+            System.out.println("❌ Nenhuma Ordem de Serviço encontrada para os critérios informados.");
         } else {
             System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
             for (OrdemServico os : resultados) {
