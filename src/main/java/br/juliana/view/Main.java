@@ -54,7 +54,6 @@ public class Main {
     private static void cadastrarCliente() {
         System.out.println("\n--- NOVO CADASTRO ---");
 
-        // 1. VALIDAÇÃO DO NOME
         String nome = "";
         while (nome.trim().isEmpty()) {
             System.out.print("Nome (Obrigatório): ");
@@ -64,7 +63,6 @@ public class Main {
             }
         }
 
-        // 2. VALIDAÇÃO DO CPF
         String cpf = "";
         while (cpf.trim().isEmpty()) {
             System.out.print("CPF (Obrigatório): ");
@@ -74,13 +72,11 @@ public class Main {
             }
         }
 
-        // 3. CAMPOS OPCIONAIS (Pode dar Enter em branco)
         System.out.print("Telefone: ");
         String telefone = scanner.nextLine();
         System.out.print("E-mail: ");
         String email = scanner.nextLine();
 
-        // Criando e salvando o objeto se tudo estiver OK
         Cliente novoCliente = new Cliente();
         novoCliente.setNome(nome);
         novoCliente.setCpf(cpf);
@@ -103,7 +99,7 @@ public class Main {
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> cadastrarCliente();
@@ -134,9 +130,8 @@ public class Main {
         System.out.println("\n--- ATUALIZAR CADASTRO ---");
         System.out.print("Digite o ID do cliente que deseja alterar: ");
         Long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
-        // 1. VALIDAÇÃO DO NOVO NOME
         String nome = "";
         while (nome.trim().isEmpty()) {
             System.out.print("Novo Nome (Obrigatório): ");
@@ -146,7 +141,6 @@ public class Main {
             }
         }
 
-        // 2. VALIDAÇÃO DO NOVO CPF
         String cpf = "";
         while (cpf.trim().isEmpty()) {
             System.out.print("Novo CPF (Obrigatório): ");
@@ -156,13 +150,11 @@ public class Main {
             }
         }
 
-        // 3. CAMPOS OPCIONAIS
         System.out.print("Novo Telefone: ");
         String telefone = scanner.nextLine();
         System.out.print("Novo E-mail: ");
         String email = scanner.nextLine();
 
-        // Montando o objeto atualizado
         Cliente clienteAtualizado = new Cliente();
         clienteAtualizado.setId(id);
         clienteAtualizado.setNome(nome);
@@ -192,7 +184,7 @@ public class Main {
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> cadastrarServico();
@@ -311,7 +303,7 @@ public class Main {
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> cadastrarColaborador();
@@ -451,11 +443,9 @@ public class Main {
 
     private static void buscarServico() {
         System.out.println("\n--- BUSCAR SERVIÇO ---");
-        // Mensagem clara para o usuário saber que pode digitar qualquer um dos três!
         System.out.print("Digite a descrição, parte dela ou o preço exato: ");
         String termo = scanner.nextLine();
 
-        // Chama o método do DAO que faz a busca dupla
         List<Servico> resultados = servicoDAO.buscarPorDescricao(termo);
 
         if (resultados.isEmpty()) {
@@ -481,7 +471,7 @@ public class Main {
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> cadastrarVeiculo();
@@ -503,14 +493,14 @@ public class Main {
         String modelo = scanner.nextLine();
         System.out.print("Ano: ");
         int ano = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
         System.out.print("Cor: ");
         String cor = scanner.nextLine();
         System.out.print("Quilometragem: ");
         int quilometragem = scanner.nextInt();
         System.out.print("ID do Cliente Proprietário (Obrigatório): ");
         long clienteId = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         Veiculo novoVeiculo = new Veiculo();
         novoVeiculo.setPlaca(placa);
@@ -559,18 +549,18 @@ public class Main {
         System.out.println("\n--- ATUALIZAR VEÍCULO ---");
         System.out.print("Digite o ID do veículo que deseja atualizar: ");
         long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         System.out.print("Novo Modelo: ");
         String modelo = scanner.nextLine();
         System.out.print("Novo Ano: ");
         int ano = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
         System.out.print("Nova Cor: ");
         String cor = scanner.nextLine();
         System.out.print("Nova Quilometragem: ");
         int quilometragem = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         Veiculo veiculoAtualizado = new Veiculo();
         veiculoAtualizado.setId(id);
@@ -586,7 +576,7 @@ public class Main {
         System.out.println("\n--- EXCLUIR VEÍCULO ---");
         System.out.print("Digite o ID do veículo que deseja deletar: ");
         long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         veiculoDAO.excluir(id);
     }
@@ -598,14 +588,14 @@ public class Main {
             System.out.println("\n--- MÓDULO: GESTÃO DE PEÇAS ---");
             System.out.println("1. Cadastrar Peça");
             System.out.println("2. Listar Peças");
-            System.out.println("3. Buscar Peça por ID");
+            System.out.println("3. Buscar Peça por Nome ou ID");
             System.out.println("4. Atualizar Peça");
             System.out.println("5. Excluir Peça");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> cadastrarPeca();
@@ -670,17 +660,19 @@ public class Main {
 
     private static void buscarPeca() {
         System.out.println("\n--- BUSCAR PEÇA ---");
-        System.out.print("Digite o ID da peça: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print("Digite o nome, parte do nome ou o ID da peça: ");
+        String termo = scanner.nextLine();
 
-        Peca encontrada = pecaDAO.buscarPorId(id);
+        List<Peca> resultados = pecaDAO.buscarPorNomeOuId(termo);
 
-        if (encontrada != null) {
-            System.out.printf("ID: %d | Nome: %s | Preço: R$ %.2f | Estoque: %d\n",
-                    encontrada.getId(), encontrada.getNome(), encontrada.getPrecoVenda(), encontrada.getEstoque());
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhuma peça encontrada com esse termo.");
         } else {
-            System.out.println("❌ Peça não encontrada.");
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Peca p : resultados) {
+                System.out.printf("ID: %d | Nome: %s | Preço: R$ %.2f | Estoque: %d\n",
+                        p.getId(), p.getNome(), p.getPrecoVenda(), p.getEstoque());
+            }
         }
     }
 

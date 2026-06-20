@@ -73,6 +73,42 @@ public class PecaDAO {
         return null;
     }
 
+    // 3.1 BUSCAR POR NOME, PARTE DO NOME OU ID
+    public List<Peca> buscarPorNomeOuId(String termo) {
+        List<Peca> resultados = new ArrayList<>();
+
+        // Detecta se o termo digitado é um número (ID) ou texto (nome)
+        boolean ehNumero = termo.matches("\\d+");
+
+        String sql = ehNumero
+                ? "SELECT * FROM pecas WHERE id = ?"
+                : "SELECT * FROM pecas WHERE nome LIKE ?";
+
+        try (Connection conn = FabricaConexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            if (ehNumero) {
+                stmt.setInt(1, Integer.parseInt(termo));
+            } else {
+                stmt.setString(1, "%" + termo + "%");
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    resultados.add(new Peca(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getDouble("preco_venda"),
+                            rs.getInt("estoque")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar peça: " + e.getMessage());
+        }
+        return resultados;
+    }
+
     // 4. ATUALIZAR (Update)
     public void atualizar(Peca peca) {
         String sql = "UPDATE pecas SET nome=?, preco_venda=?, estoque=? WHERE id=?";
@@ -91,7 +127,7 @@ public class PecaDAO {
         }
     }
 
-    // 5. EXCLUIR (Delete)
+    // 5. EXCLUIR (Delete) — com tratamento de vínculo (FK)
     public void excluir(int id) {
         String sql = "DELETE FROM pecas WHERE id = ?";
 
@@ -101,6 +137,10 @@ public class PecaDAO {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             System.out.println("Peça excluída com sucesso!");
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("❌ Não foi possível excluir: esta peça já está vinculada a uma Ordem de Serviço e não pode ser removida.");
+
         } catch (SQLException e) {
             System.err.println("Erro ao excluir peça: " + e.getMessage());
         }
