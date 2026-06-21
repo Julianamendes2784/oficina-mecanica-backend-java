@@ -1,19 +1,7 @@
 package br.juliana.view;
 
-import br.juliana.dao.ClienteDAO;
-import br.juliana.dao.ColaboradorDAO;
-import br.juliana.dao.OrdemServicoDAO;
-import br.juliana.dao.PecaDAO;
-import br.juliana.dao.ServicoDAO;
-import br.juliana.dao.UsuarioDAO;
-import br.juliana.dao.VeiculoDAO;
-import br.juliana.model.Cliente;
-import br.juliana.model.Colaborador;
-import br.juliana.model.OrdemServico;
-import br.juliana.model.Peca;
-import br.juliana.model.Servico;
-import br.juliana.model.Usuario;
-import br.juliana.model.Veiculo;
+import br.juliana.dao.*;
+import br.juliana.model.*;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -27,6 +15,9 @@ public class Main {
     private static OrdemServicoDAO ordemServicoDAO = new OrdemServicoDAO();
     private static UsuarioDAO usuarioDAO = new UsuarioDAO();
     private static PecaDAO pecaDAO = new PecaDAO();
+    private static OsMecanicoDAO osMecanicoDAO = new OsMecanicoDAO();
+    private static OsPecaUtilizadaDAO osPecaUtilizadaDAO = new OsPecaUtilizadaDAO();
+    private static OsServicoPrestadoDAO osServicoPrestadoDAO = new OsServicoPrestadoDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -710,6 +701,10 @@ public class Main {
             System.out.println("2. Listar Todas as O.S.");
             System.out.println("3. Cancelar Ordem de Serviço");
             System.out.println("4. Buscar O.S. (Nº, Situação ou Data)");
+            System.out.println("5. Adicionar Mecânico à O.S.");
+            System.out.println("6. Adicionar Serviço à O.S.");
+            System.out.println("7. Adicionar Peça à O.S.");
+            System.out.println("8. Listar Peças da O.S.");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
 
@@ -736,6 +731,24 @@ public class Main {
                 case 4:
                     buscarOrdemServicos();
                     break;
+
+                case 5:
+                    adicionarMecanicoOS();
+                    break;
+
+                case 6:
+                    adicionarServicoOS();
+                    break;
+
+                case 7:
+                    adicionarPecaOS();
+                    break;
+
+               case 8:
+                listarPecasOS();
+                break;
+
+
                 case 0:
                     System.out.println("Voltando ao menu principal...");
                     break;
@@ -745,6 +758,7 @@ public class Main {
             }
         }
     }
+
 
     private static void abrirOrdemServicos() {
         System.out.println("\n--- ABERTURA DE ORDEM DE SERVIÇO ---");
@@ -960,4 +974,104 @@ public class Main {
 
             pecaDAO.excluir(id);
         }
+
+
+    private static void adicionarMecanicoOS() {
+        try {
+            System.out.print("ID da Ordem de Serviço: ");
+            int osId = scanner.nextInt();
+
+            System.out.print("ID do Colaborador: ");
+            int colaboradorId = scanner.nextInt();
+            scanner.nextLine();
+
+            OsMecanico m = new OsMecanico(osId, colaboradorId);
+            osMecanicoDAO.inserir(m);
+
+            System.out.println("✅ Mecânico adicionado!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
+    private static void adicionarServicoOS() {
+        try {
+            System.out.print("ID da Ordem de Serviço: ");
+            int osId = scanner.nextInt();
+
+            System.out.print("ID do Serviço: ");
+            int servicoId = scanner.nextInt();
+
+            System.out.print("Preço aplicado: ");
+            double preco = scanner.nextDouble();
+            scanner.nextLine();
+
+            OsServicoPrestado s = new OsServicoPrestado(osId, servicoId, preco);
+            osServicoPrestadoDAO.inserir(s);
+
+            System.out.println("✅ Serviço adicionado!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void adicionarPecaOS() {
+        try {
+            System.out.print("ID da Ordem de Serviço: ");
+            int osId = scanner.nextInt();
+
+            System.out.print("ID da Peça: ");
+            int pecaId = scanner.nextInt();
+
+            System.out.print("Quantidade: ");
+            int quantidade = scanner.nextInt();
+
+            System.out.print("Preço aplicado: ");
+            double preco = scanner.nextDouble();
+            scanner.nextLine();
+
+            OsPecaUtilizada p = new OsPecaUtilizada(osId, pecaId, quantidade, preco);
+            osPecaUtilizadaDAO.inserir(p);
+
+            System.out.println("✅ Peça adicionada!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void listarPecasOS() {
+        try {
+            System.out.print("ID da Ordem de Serviço: ");
+            int osId = scanner.nextInt();
+            scanner.nextLine();
+
+            List<OsPecaUtilizada> lista = osPecaUtilizadaDAO.listarPorOrdem(osId);
+
+            if (lista.isEmpty()) {
+                System.out.println("❌ Nenhuma peça encontrada.");
+            } else {
+                System.out.println("\n--- PEÇAS DA O.S. ---");
+
+                for (OsPecaUtilizada p : lista) {
+                    System.out.println(
+                            "Peça ID: " + p.getPecaId() +
+                                    " | Qtde: " + p.getQuantidade() +
+                                    " | Preço: R$ " + p.getPrecoAplicado()
+                    );
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+}
