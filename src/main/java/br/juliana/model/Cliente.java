@@ -10,6 +10,7 @@ public class Cliente {
     public Cliente() {
     }
 
+<<<<<<< HEAD
     public Cliente(Long id, String nome, String cpf, String telefone, String email) {
         this.id = id;
         this.nome = nome;
@@ -18,6 +19,9 @@ public class Cliente {
         this.email = email;
     }
 
+=======
+    // Getters e Setters
+>>>>>>> feature/normalizacao-e-seguranca-db
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -26,18 +30,38 @@ public class Cliente {
 
     public String getCpf() { return cpf; }
     public void setCpf(String cpf) {
+<<<<<<< HEAD
         this.cpf = cpf != null ? cpf.replaceAll("[^0-9]", "") : null;
+=======
+        if (cpf != null) {
+            this.cpf = cpf.replaceAll("[^0-9]", "");
+        } else {
+            this.cpf = null;
+        }
+>>>>>>> feature/normalizacao-e-seguranca-db
     }
 
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) {
+<<<<<<< HEAD
         this.telefone = telefone != null ? telefone.replaceAll("[^0-9]", "") : null;
+=======
+        if (telefone != null) {
+            this.telefone = telefone.replaceAll("[^0-9]", "");
+        } else {
+            this.telefone = null;
+        }
+>>>>>>> feature/normalizacao-e-seguranca-db
     }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
+<<<<<<< HEAD
     // 4. Métodos Utilitários de Máscara Visual para a View
+=======
+    // Métodos Utilitários para exibição formatada na View
+>>>>>>> feature/normalizacao-e-seguranca-db
     public String getCpfFormatado() {
         if (this.cpf != null && this.cpf.length() == 11) {
             return this.cpf.substring(0, 3) + "." +
@@ -60,6 +84,7 @@ public class Cliente {
         }
         return this.telefone;
     }
+<<<<<<< HEAD
 
      public static ClienteBuilder builder() {
         return new ClienteBuilder();
@@ -82,4 +107,6 @@ public class Cliente {
             return new Cliente(id, nome, cpf, telefone, email);
         }
     }
+=======
+>>>>>>> feature/normalizacao-e-seguranca-db
 }
