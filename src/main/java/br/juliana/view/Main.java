@@ -1,7 +1,17 @@
 package br.juliana.view;
 
-import br.juliana.dao.*;
-import br.juliana.model.*;
+import br.juliana.dao.ClienteDAO;
+import br.juliana.dao.ColaboradorDAO;
+import br.juliana.dao.OrdemServicoDAO;
+import br.juliana.dao.ServicoDAO;
+import br.juliana.dao.UsuarioDAO;
+import br.juliana.dao.VeiculoDAO;
+import br.juliana.model.Cliente;
+import br.juliana.model.Colaborador;
+import br.juliana.model.OrdemServico;
+import br.juliana.model.Servico;
+import br.juliana.model.Usuario;
+import br.juliana.model.Veiculo;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -13,9 +23,33 @@ public class Main {
     private static ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
     private static VeiculoDAO veiculoDAO = new VeiculoDAO();
     private static OrdemServicoDAO ordemServicoDAO = new OrdemServicoDAO();
+    private static UsuarioDAO usuarioDAO = new UsuarioDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
+        Usuario usuarioLogado = null;
+
+        System.out.println("========================================");
+        System.out.println("    MECÂNICA TOPLÍDER - AUTENTICAÇÃO   ");
+        System.out.println("========================================");
+
+        // 🔒 PORTÃO DE SEGURANÇA: Só passa se o usuário existir no banco
+        while (usuarioLogado == null) {
+            System.out.print("Digite o Usuário: ");
+            String login = scanner.nextLine();
+
+            System.out.print("Digite a Senha: ");
+            String senha = scanner.nextLine();
+
+            usuarioLogado = usuarioDAO.autenticar(login, senha);
+
+            if (usuarioLogado == null) {
+                System.out.println("\n❌ Usuário ou senha incorretos! Tente novamente.\n");
+            }
+        }
+
+        System.out.println("\n✅ Login realizado com sucesso! Bem-vindo(a), " + usuarioLogado.getLogin() + ".\n");
+
         int opcao = -1;
 
         while (opcao != 0) {
@@ -33,21 +67,77 @@ public class Main {
             scanner.nextLine();
 
             switch (opcao) {
-                case 1 -> menuClientes();
-                case 2 -> menuServicos();
-                case 3 -> menuColaboradores();
-                case 4 -> menuVeiculos();
-                case 5 -> menuOrdensServico();
-                case 0 -> System.out.println("Encerrando o sistema... Até logo!");
-                default -> System.out.println("Opção inválida! Tente novamente.");
+                case 1:
+                    menuClientes();
+                    break;
+                case 2:
+                    menuServicos();
+                    break;
+                case 3:
+                    menuColaboradores();
+                    break;
+                case 4:
+                    menuVeiculos();
+                    break;
+                case 5:
+                    menuOrdensServicos();
+                    break;
+                case 0:
+                    System.out.println("Encerrando o sistema... Até logo!");
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+                    break;
+            }
+        }
+    }
+
+    // ==========================================
+    // 👥 MÓDULO: CLIENTES
+    // ==========================================
+    private static void menuClientes() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MÓDULO: GESTÃO DE CLIENTES ---");
+            System.out.println("1. Cadastrar Cliente");
+            System.out.println("2. Listar Clientes");
+            System.out.println("3. Buscar Cliente por Nome");
+            System.out.println("4. Atualizar Cliente");
+            System.out.println("5. Excluir Cliente");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcao) {
+                case 1:
+                    cadastrarCliente();
+                    break;
+                case 2:
+                    listarClientes();
+                    break;
+                case 3:
+                    buscarCliente();
+                    break;
+                case 4:
+                    atualizarCliente();
+                    break;
+                case 5:
+                    excluirCliente();
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu anterior...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
             }
         }
     }
 
     private static void cadastrarCliente() {
         System.out.println("\n--- NOVO CADASTRO ---");
-
-        // 1. VALIDAÇÃO DO NOME
         String nome = "";
         while (nome.trim().isEmpty()) {
             System.out.print("Nome (Obrigatório): ");
@@ -80,32 +170,6 @@ public class Main {
         clienteDAO.cadastrar(novoCliente);
     }
 
-    private static void menuClientes() {
-        int opcao = -1;
-        while (opcao != 0) {
-            System.out.println("\n--- MÓDULO: GESTÃO DE CLIENTES ---");
-            System.out.println("1. Cadastrar Cliente");
-            System.out.println("2. Listar Clientes");
-            System.out.println("3. Buscar Cliente por Nome");
-            System.out.println("4. Atualizar Cliente");
-            System.out.println("5. Excluir Cliente");
-            System.out.println("0. Voltar ao Menu Principal");
-            System.out.print("Escolha uma opção: ");
-
-            opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
-
-            switch (opcao) {
-                case 1 -> cadastrarCliente();
-                case 2 -> listarClientes();
-                case 3 -> buscarCliente();
-                case 4 -> atualizarCliente();
-                case 5 -> excluirCliente();
-                case 0 -> System.out.println("Voltando ao menu anterior...");
-                default -> System.out.println("Opção inválida!");
-            }
-        }
-    }
     private static void listarClientes() {
         System.out.println("\n--- LISTA DE CLIENTES ---");
         List<Cliente> lista = clienteDAO.listarTodos();
@@ -120,11 +184,29 @@ public class Main {
         }
     }
 
+    private static void buscarCliente() {
+        System.out.println("\n--- BUSCAR CLIENTE ---");
+        System.out.print("Digite o nome ou parte do nome do cliente: ");
+        String termo = scanner.nextLine();
+
+        List<Cliente> resultados = clienteDAO.buscarPorNome(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum cliente encontrado com esse termo.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Cliente c : resultados) {
+                System.out.printf("ID: %d | Nome: %s | CPF: %s | Telefone: %s\n",
+                        c.getId(), c.getNome(), c.getCpf(), c.getTelefone());
+            }
+        }
+    }
+
     private static void atualizarCliente() {
         System.out.println("\n--- ATUALIZAR CADASTRO ---");
         System.out.print("Digite o ID do cliente que deseja alterar: ");
         Long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         String nome = "";
         while (nome.trim().isEmpty()) {
@@ -163,9 +245,14 @@ public class Main {
         System.out.println("\n--- EXCLUIR CLIENTE ---");
         System.out.print("Digite o ID do cliente que deseja deletar: ");
         Long id = scanner.nextLong();
+        scanner.nextLine();
 
         clienteDAO.excluir(id);
     }
+
+    // ==========================================
+    // 🛠️ MÓDULO: SERVIÇOS
+    // ==========================================
     private static void menuServicos() {
         int opcao = -1;
         while (opcao != 0) {
@@ -178,23 +265,36 @@ public class Main {
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
-                case 1 -> cadastrarServico();
-                case 2 -> listarServicos();
-                case 3 -> buscarServico();
-                case 4 -> atualizarServico();
-                case 5 -> excluirServico();
-                case 0 -> System.out.println("Voltando ao menu principal...");
-                default -> System.out.println("Opção inválida!");
+                case 1:
+                    cadastrarServico();
+                    break;
+                case 2:
+                    listarServicos();
+                    break;
+                case 3:
+                    buscarServico();
+                    break;
+                case 4:
+                    atualizarServico();
+                    break;
+                case 5:
+                    excluirServico();
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu principal...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
             }
         }
     }
 
     private static void cadastrarServico() {
         System.out.println("\n--- NOVO SERVIÇO ---");
-
         String descricao = "";
         while (descricao.trim().isEmpty()) {
             System.out.print("Descrição (Obrigatório): ");
@@ -233,6 +333,23 @@ public class Main {
             System.out.println("Nenhum serviço cadastrado.");
         } else {
             for (Servico s : lista) {
+                System.out.printf("ID: %d | Descrição: %s | Preço: R$ %.2f\n", s.getId(), s.getDescricao(), s.getPrecoTabela());
+            }
+        }
+    }
+
+    private static void buscarServico() {
+        System.out.println("\n--- BUSCAR SERVIÇO ---");
+        System.out.print("Digite a descrição, parte dela ou o preço exato: ");
+        String termo = scanner.nextLine();
+
+        List<Servico> resultados = servicoDAO.buscarPorDescricao(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum serviço encontrado com esse termo ou preço.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Servico s : resultados) {
                 System.out.printf("ID: %d | Descrição: %s | Preço: R$ %.2f\n", s.getId(), s.getDescricao(), s.getPrecoTabela());
             }
         }
@@ -284,6 +401,10 @@ public class Main {
 
         servicoDAO.excluir(id);
     }
+
+    // ==========================================
+    // 👔 MÓDULO: COLABORADORES
+    // ==========================================
     private static void menuColaboradores() {
         int opcao = -1;
         while (opcao != 0) {
@@ -297,23 +418,36 @@ public class Main {
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
-                case 1 -> cadastrarColaborador();
-                case 2 -> listarColaboradores();
-                case 3 -> buscarColaborador();
-                case 4 -> atualizarColaborador();
-                case 5 -> excluirColaborador();
-                case 0 -> System.out.println("Voltando ao menu anterior...");
-                default -> System.out.println("Opção inválida!");
+                case 1:
+                    cadastrarColaborador();
+                    break;
+                case 2:
+                    listarLaboradores();
+                    break;
+                case 3:
+                    buscarColaborador();
+                    break;
+                case 4:
+                    atualizarColaborador();
+                    break;
+                case 5:
+                    excluirColaborador();
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu anterior...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
             }
         }
     }
 
     private static void cadastrarColaborador() {
         System.out.println("\n--- NOVO COLABORADOR ---");
-
         String nome = "";
         while (nome.trim().isEmpty()) {
             System.out.print("Nome (Obrigatório): ");
@@ -343,13 +477,31 @@ public class Main {
         colaboradorDAO.cadastrar(c);
     }
 
-    private static void listarColaboradores() {
+    private static void listarLaboradores() {
         System.out.println("\n--- LISTA DE COLABORADORES ---");
         List<Colaborador> lista = colaboradorDAO.listarTodos();
         if (lista.isEmpty()) {
             System.out.println("Nenhum colaborador cadastrado.");
         } else {
             for (Colaborador c : lista) {
+                System.out.printf("ID: %d | Nome: %s | Cargo: %s | Especialidade: %s\n",
+                        c.getId(), c.getNome(), c.getCargo(), c.getEspecialidade());
+            }
+        }
+    }
+
+    private static void buscarColaborador() {
+        System.out.println("\n--- BUSCAR COLABORADOR ---");
+        System.out.print("Digite o nome ou parte do nome: ");
+        String termo = scanner.nextLine();
+
+        List<Colaborador> resultados = colaboradorDAO.buscarPorNome(termo);
+
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum colaborador encontrado com esse termo.");
+        } else {
+            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
+            for (Colaborador c : resultados) {
                 System.out.printf("ID: %d | Nome: %s | Cargo: %s | Especialidade: %s\n",
                         c.getId(), c.getNome(), c.getCargo(), c.getEspecialidade());
             }
@@ -400,60 +552,10 @@ public class Main {
 
         colaboradorDAO.excluir(id);
     }
-    private static void buscarColaborador() {
-        System.out.println("\n--- BUSCAR COLABORADOR ---");
-        System.out.print("Digite o nome ou parte do nome: ");
-        String termo = scanner.nextLine();
 
-        List<Colaborador> resultados = colaboradorDAO.buscarPorNome(termo);
-
-        if (resultados.isEmpty()) {
-            System.out.println("❌ Nenhum colaborador encontrado com esse termo.");
-        } else {
-            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
-            for (Colaborador c : resultados) {
-                System.out.printf("ID: %d | Nome: %s | Cargo: %s | Especialidade: %s\n",
-                        c.getId(), c.getNome(), c.getCargo(), c.getEspecialidade());
-            }
-        }
-    }
-    private static void buscarCliente() {
-        System.out.println("\n--- BUSCAR CLIENTE ---");
-        System.out.print("Digite o nome ou parte do nome do cliente: ");
-        String termo = scanner.nextLine();
-
-        List<Cliente> resultados = clienteDAO.buscarPorNome(termo);
-
-        if (resultados.isEmpty()) {
-            System.out.println("❌ Nenhum cliente encontrado com esse termo.");
-        } else {
-            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
-            for (Cliente c : resultados) {
-                System.out.printf("ID: %d | Nome: %s | CPF: %s | Telefone: %s\n",
-                        c.getId(), c.getNome(), c.getCpf(), c.getTelefone());
-            }
-        }
-    }
-
-    private static void buscarServico() {
-        System.out.println("\n--- BUSCAR SERVIÇO ---");
-        // Mensagem clara para o usuário saber que pode digitar qualquer um dos três!
-        System.out.print("Digite a descrição, parte dela ou o preço exato: ");
-        String termo = scanner.nextLine();
-
-        // Chama o método do DAO que faz a busca dupla
-        List<Servico> resultados = servicoDAO.buscarPorDescricao(termo);
-
-        if (resultados.isEmpty()) {
-            System.out.println("❌ Nenhum serviço encontrado com esse termo ou preço.");
-        } else {
-            System.out.println("\n--- RESULTADOS ENCONTRADOS ---");
-            for (Servico s : resultados) {
-                System.out.printf("ID: %d | Descrição: %s | Preço: R$ %.2f\n",
-                        s.getId(), s.getDescricao(), s.getPrecoTabela());
-            }
-        }
-    }
+    // ==========================================
+    // 🚗 MÓDULO: VEÍCULOS
+    // ==========================================
     private static void menuVeiculos() {
         int opcao = -1;
         while (opcao != 0) {
@@ -467,16 +569,30 @@ public class Main {
             System.out.print("Escolha uma opção: ");
 
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
 
             switch (opcao) {
-                case 1 -> cadastrarVeiculo();
-                case 2 -> listarVeiculos();
-                case 3 -> buscarVeiculo();
-                case 4 -> atualizarVeiculo();
-                case 5 -> excluirVeiculo();
-                case 0 -> System.out.println("Voltando ao menu principal...");
-                default -> System.out.println("Opção inválida!");
+                case 1:
+                    cadastrarVeiculo();
+                    break;
+                case 2:
+                    listarVeiculo();
+                    break;
+                case 3:
+                    buscarVeiculo();
+                    break;
+                case 4:
+                    atualizarVeiculo();
+                    break;
+                case 5:
+                    excluirVeiculo();
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu principal...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
             }
         }
     }
@@ -489,14 +605,14 @@ public class Main {
         String modelo = scanner.nextLine();
         System.out.print("Ano: ");
         int ano = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
         System.out.print("Cor: ");
         String cor = scanner.nextLine();
         System.out.print("Quilometragem: ");
         int quilometragem = scanner.nextInt();
         System.out.print("ID do Cliente Proprietário (Obrigatório): ");
         long clienteId = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         Veiculo novoVeiculo = new Veiculo();
         novoVeiculo.setPlaca(placa);
@@ -509,7 +625,7 @@ public class Main {
         veiculoDAO.cadastrar(novoVeiculo);
     }
 
-    private static void listarVeiculos() {
+    private static void listarVeiculo() {
         System.out.println("\n--- LISTA DE VEÍCULOS ---");
         List<Veiculo> lista = veiculoDAO.listarTodos();
 
@@ -545,18 +661,18 @@ public class Main {
         System.out.println("\n--- ATUALIZAR VEÍCULO ---");
         System.out.print("Digite o ID do veículo que deseja atualizar: ");
         long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         System.out.print("Novo Modelo: ");
         String modelo = scanner.nextLine();
         System.out.print("Novo Ano: ");
         int ano = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
         System.out.print("Nova Cor: ");
         String cor = scanner.nextLine();
         System.out.print("Nova Quilometragem: ");
         int quilometragem = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         Veiculo veiculoAtualizado = new Veiculo();
         veiculoAtualizado.setId(id);
@@ -572,11 +688,15 @@ public class Main {
         System.out.println("\n--- EXCLUIR VEÍCULO ---");
         System.out.print("Digite o ID do veículo que deseja deletar: ");
         long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         veiculoDAO.excluir(id);
     }
-    private static void menuOrdensServico() {
+
+    // ==========================================
+    // 📋 MÓDULO: ORDENS DE SERVIÇO (O.S.)
+    // ==========================================
+    private static void menuOrdensServicos() {
         int opcao = -1;
         while (opcao != 0) {
             System.out.println("\n--- MÓDULO: GESTÃO DE ORDENS DE SERVIÇO ---");
@@ -598,22 +718,33 @@ public class Main {
             }
 
             switch (opcao) {
-                case 1 -> abrirOrdemServico();
-                case 2 -> listarOrdensServico();
-                case 3 -> cancelarOrdemServico();
-                case 4 -> buscarOrdemServico();
-                case 0 -> System.out.println("Voltando ao menu principal...");
-                default -> System.out.println("Opção inválida!");
+                case 1:
+                    abrirOrdemServicos();
+                    break;
+                case 2:
+                    listarOrdensServicos();
+                    break;
+                case 3:
+                    cancelarOrdemServicos();
+                    break;
+                case 4:
+                    buscarOrdemServicos();
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu principal...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
             }
         }
     }
 
-    private static void abrirOrdemServico() {
+    private static void abrirOrdemServicos() {
         System.out.println("\n--- ABERTURA DE ORDEM DE SERVIÇO ---");
         System.out.print("Número da O.S. (ex: 1011): ");
         int numeroOs = scanner.nextInt();
         scanner.nextLine();
-
 
         System.out.print("ID do Cliente: ");
         long clienteId = scanner.nextLong();
@@ -621,9 +752,8 @@ public class Main {
         long veiculoId = scanner.nextLong();
         System.out.print("ID do Colaborador (Mecânico Responsável): ");
         long colaboradorId = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
-        // --- CHECKLIST DE ENTRADA DO VEÍCULO ---
         System.out.println("\n--- CHECKLIST DE ENTRADA (Responda 1 para SIM, 0 para NÃO) ---");
         System.out.print("Possui Estepe? ");
         boolean chkEstepe = scanner.nextInt() == 1;
@@ -633,7 +763,7 @@ public class Main {
         boolean chkTriangulo = scanner.nextInt() == 1;
         System.out.print("Possui Rádio/Multimídia? ");
         boolean chkRadio = scanner.nextInt() == 1;
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         System.out.print("Nível de Combustível (ex: CHEIO, MEIO_TANQUE, RESERVA): ");
         String combustivel = scanner.nextLine().toUpperCase();
@@ -641,7 +771,6 @@ public class Main {
         System.out.print("Observações / Avarias Visíveis: ");
         String avarias = scanner.nextLine();
 
-        // Montando o Objeto O.S.
         OrdemServico novaOs = new OrdemServico();
         novaOs.setNumeroOs(numeroOs);
         novaOs.setSituacao("ABERTA");
@@ -665,12 +794,12 @@ public class Main {
         ordemServicoDAO.cadastrar(novaOs);
     }
 
-    private static void listarOrdensServico() {
+    private static void listarOrdensServicos() {
         System.out.println("\n--- LISTA DE ORDENS DE SERVIÇO ---");
         List<OrdemServico> lista = ordemServicoDAO.listarTodas();
 
         if (lista.isEmpty()) {
-            System.out.println("Nenhuma O.S. cadastrada.");
+            System.out.println("Nenhum O.S. cadastrada.");
         } else {
             for (OrdemServico os : lista) {
                 System.out.printf("ID: %d | Nº O.S.: %d | Situação: %s | Data Abertura: %s | Cliente ID: %d | Veículo ID: %d | Total: R$ %.2f\n",
@@ -679,11 +808,11 @@ public class Main {
         }
     }
 
-    private static void cancelarOrdemServico() {
+    private static void cancelarOrdemServicos() {
         System.out.println("\n--- CANCELAR ORDEM DE SERVIÇO ---");
         System.out.print("Digite o ID da Ordem de Serviço que deseja cancelar: ");
         long id = scanner.nextLong();
-        scanner.nextLine(); // Limpar buffer
+        scanner.nextLine();
 
         System.out.print("Digite o motivo do cancelamento (Obrigatório): ");
         String motivo = scanner.nextLine();
@@ -691,7 +820,7 @@ public class Main {
         ordemServicoDAO.processarCancelamento(id, motivo);
     }
 
-    private static void buscarOrdemServico() {
+    private static void buscarOrdemServicos() {
         System.out.println("\n--- BUSCAR ORDEM DE SERVIÇO ---");
         System.out.println("1. Buscar por Número da O.S. ou Situação");
         System.out.println("2. Filtrar por Período de Datas");
@@ -700,15 +829,14 @@ public class Main {
         int tipoSubBusca = 0;
         try {
             tipoSubBusca = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();
         } catch (Exception e) {
             System.out.println("❌ Erro: Digite apenas o número da opção desejada!");
-            scanner.nextLine(); // Limpa o buffer que ficou sujo com a digitação errada
-            return; // Encerra o método com segurança e volta para o menu
+            scanner.nextLine();
+            return;
         }
 
         List<OrdemServico> resultados = new ArrayList<>();
-        // ... o restante do método (if / else if) continua exatamente igual ...
 
         if (tipoSubBusca == 1) {
             System.out.print("Digite o número da O.S. ou a situação: ");
@@ -726,7 +854,6 @@ public class Main {
             return;
         }
 
-        // Exibição dos resultados encontrados
         if (resultados.isEmpty()) {
             System.out.println("❌ Nenhuma Ordem de Serviço encontrada para os critérios informados.");
         } else {
