@@ -881,6 +881,7 @@ public class Main {
             System.out.println("1. Cadastrar Peça");
             System.out.println("2. Listar Peças");
             System.out.println("3. Buscar Peça");
+            System.out.println("4. Excluir Peça");
             System.out.println("0. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
@@ -895,6 +896,9 @@ public class Main {
                     break;
                 case 3:
                     buscarPeca();
+                    break;
+                case 4:
+                    excluirPeca();
                     break;
                 case 0:
                     System.out.println("Voltando ao menu principal...");
@@ -947,4 +951,13 @@ public class Main {
             }
         }
     }
-}
+        private static void excluirPeca() {
+            System.out.println("\n--- EXCLUIR PEÇA ---");
+            listarPecas();
+            System.out.print("Digite o ID da peça que deseja excluir: ");
+            Long id = scanner.nextLong();
+            scanner.nextLine();
+
+            pecaDAO.excluir(id);
+        }
+    }
