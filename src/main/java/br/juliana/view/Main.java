@@ -3,12 +3,14 @@ package br.juliana.view;
 import br.juliana.dao.ClienteDAO;
 import br.juliana.dao.ColaboradorDAO;
 import br.juliana.dao.OrdemServicoDAO;
+import br.juliana.dao.PecaDAO;
 import br.juliana.dao.ServicoDAO;
 import br.juliana.dao.UsuarioDAO;
 import br.juliana.dao.VeiculoDAO;
 import br.juliana.model.Cliente;
 import br.juliana.model.Colaborador;
 import br.juliana.model.OrdemServico;
+import br.juliana.model.Peca;
 import br.juliana.model.Servico;
 import br.juliana.model.Usuario;
 import br.juliana.model.Veiculo;
@@ -24,6 +26,7 @@ public class Main {
     private static VeiculoDAO veiculoDAO = new VeiculoDAO();
     private static OrdemServicoDAO ordemServicoDAO = new OrdemServicoDAO();
     private static UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private static PecaDAO pecaDAO = new PecaDAO();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -33,7 +36,6 @@ public class Main {
         System.out.println("    MECÂNICA TOPLÍDER - AUTENTICAÇÃO   ");
         System.out.println("========================================");
 
-        // 🔒 PORTÃO DE SEGURANÇA: Só passa se o usuário existir no banco
         while (usuarioLogado == null) {
             System.out.print("Digite o Usuário: ");
             String login = scanner.nextLine();
@@ -60,6 +62,7 @@ public class Main {
             System.out.println("3. Gestão de Colaboradores");
             System.out.println("4. Gestão de Veículos");
             System.out.println("5. Gestão de Ordens de Serviço (O.S.)");
+            System.out.println("6. Gestão de Peças");
             System.out.println("0. Sair do Sistema");
             System.out.print("Escolha uma opção: ");
 
@@ -81,6 +84,9 @@ public class Main {
                     break;
                 case 5:
                     menuOrdensServicos();
+                    break;
+                case 6:
+                    menuPecas();
                     break;
                 case 0:
                     System.out.println("Encerrando o sistema... Até logo!");
@@ -314,7 +320,7 @@ public class Main {
                 try {
                     precoTabela = Double.parseDouble(entradaPreco.replace(",", "."));
                 } catch (NumberFormatException e) {
-                    System.out.println("⚠️ Erro: Digite um preço numérico válido (Ex: 150.00)!");
+                    System.out.println("⚠️ Erro: Digite um preço numérico válido!");
                 }
             }
         }
@@ -843,9 +849,9 @@ public class Main {
             String termo = scanner.nextLine();
             resultados = ordemServicoDAO.buscarPorTermo(termo);
         } else if (tipoSubBusca == 2) {
-            System.out.print("Digite a Data Inicial (Formato: AAAA-MM-DD, ex: 2026-06-01): ");
+            System.out.print("Digite a Data Inicial (Formato: AAAA-MM-DD): ");
             String dataInicio = scanner.nextLine();
-            System.out.print("Digite a Data Final (Formato: AAAA-MM-DD, ex: 2026-06-08): ");
+            System.out.print("Digite a Data Final (Formato: AAAA-MM-DD): ");
             String dataFim = scanner.nextLine();
 
             resultados = ordemServicoDAO.buscarPorPeriodo(dataInicio, dataFim);
@@ -861,6 +867,83 @@ public class Main {
             for (OrdemServico os : resultados) {
                 System.out.printf("ID: %d | Nº O.S.: %d | Situação: %s | Data Abertura: %s | Total: R$ %.2f\n",
                         os.getId(), os.getNumeroOs(), os.getSituacao(), os.getDataAbertura(), os.getValorTotalGeral());
+            }
+        }
+    }
+
+    // ==========================================
+    // 📦 MÓDULO: PEÇAS
+    // ==========================================
+    private static void menuPecas() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- GESTÃO DE PEÇAS ---");
+            System.out.println("1. Cadastrar Peça");
+            System.out.println("2. Listar Peças");
+            System.out.println("3. Buscar Peça");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcao) {
+                case 1:
+                    cadastrarPeca();
+                    break;
+                case 2:
+                    listarPecas();
+                    break;
+                case 3:
+                    buscarPeca();
+                    break;
+                case 0:
+                    System.out.println("Voltando ao menu principal...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
+            }
+        }
+    }
+
+    private static void cadastrarPeca() {
+        System.out.println("\n--- NOVA PEÇA ---");
+        System.out.print("Nome do Componente: ");
+        String nome = scanner.nextLine();
+        System.out.print("Preço Unitário: ");
+        double preco = scanner.nextDouble();
+        scanner.nextLine();
+
+        Peca novaPeca = new Peca();
+        novaPeca.setNomeComponente(nome);
+        novaPeca.setPrecoUnitario(preco);
+
+        pecaDAO.cadastrar(novaPeca);
+    }
+
+    private static void listarPecas() {
+        System.out.println("\n--- LISTA DE PEÇAS ---");
+        List<Peca> lista = pecaDAO.listarTodas();
+        if (lista.isEmpty()) {
+            System.out.println("Nenhuma peça cadastrada.");
+        } else {
+            for (Peca p : lista) {
+                System.out.printf("ID: %d | Componente: %s | Preço: R$ %.2f\n", p.getId(), p.getNomeComponente(), p.getPrecoUnitario());
+            }
+        }
+    }
+
+    private static void buscarPeca() {
+        System.out.println("\n--- BUSCAR PEÇA ---");
+        System.out.print("Digite o nome ou ID da peça: ");
+        String termo = scanner.nextLine();
+
+        List<Peca> resultados = pecaDAO.buscarPorTermo(termo);
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhuma peça encontrada.");
+        } else {
+            for (Peca p : resultados) {
+                System.out.printf("ID: %d | Componente: %s | Preço: R$ %.2f\n", p.getId(), p.getNomeComponente(), p.getPrecoUnitario());
             }
         }
     }
