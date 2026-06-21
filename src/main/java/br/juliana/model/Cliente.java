@@ -7,7 +7,6 @@ public class Cliente {
     private String telefone;
     private String email;
 
-    // Construtor Vazio
     public Cliente() {
     }
 
@@ -23,30 +22,15 @@ public class Cliente {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
+    public String getCpf() { return cpf; }
     public void setCpf(String cpf) {
         this.cpf = cpf != null ? cpf.replaceAll("[^0-9]", "") : null;
     }
 
-    public String getTelefone() {
-        return telefone;
-    }
-
+    public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) {
         this.telefone = telefone != null ? telefone.replaceAll("[^0-9]", "") : null;
     }
@@ -65,8 +49,17 @@ public class Cliente {
         return this.cpf;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getTelefoneFormatado() {
+        if (this.telefone != null && this.telefone.length() == 11) {
+            return "(" + this.telefone.substring(0, 2) + ") " +
+                    this.telefone.substring(2, 7) + "-" +
+                    this.telefone.substring(7, 11);
+        } else if (this.telefone != null && this.telefone.length() == 10) {
+            return "(" + this.telefone.substring(0, 2) + ") " +
+                    this.telefone.substring(2, 6) + "-" +
+                    this.telefone.substring(6, 10);
+        }
+        return this.telefone;
     }
 
     public static ClienteBuilder builder() {
