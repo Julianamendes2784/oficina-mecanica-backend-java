@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `defaultdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-USE `defaultdb`;
 -- MySQL dump 10.13  Distrib 8.0.45, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: defaultdb
@@ -32,7 +30,7 @@ CREATE TABLE `clientes` (
   `email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cpf` (`cpf`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +39,7 @@ CREATE TABLE `clientes` (
 
 LOCK TABLES `clientes` WRITE;
 /*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
-INSERT INTO `clientes` VALUES (1,'Nome Atualizado do Cliente','123.456.789-00','(11) 99999-0000','novo_email@teste.com'),(2,'Lucas Rodrigues','234.567.890-11','(11) 97777-6666','lucas.rod@email.com'),(3,'Mariana Costa','345.678.901-22','(21) 96666-5555','mari.costa@email.com'),(4,'Rodrigo Almeida','456.789.012-33','(31) 95555-4444','rodrigo.alm@email.com'),(5,'Beatriz Santos','567.890.123-44','(11) 94444-3333','bia.santos@email.com'),(6,'André Oliveira','678.890.123-55','(19) 93333-2222','andre.oli@email.com'),(7,'Camila Souza','789.012.345-66','(11) 92222-1111','camila.souza@email.com'),(8,'Ricardo Pereira','890.123.456-77','(21) 91111-0000','ricardo.p@email.com'),(9,'Fernanda Lima','901.234.567-88','(41) 99999-8888','fer.lima@email.com'),(10,'Thiago Barbosa','012.345.678-99','(11) 98888-1122','thiago.b@email.com'),(11,'Amanda Martins','112.233.445-55','(31) 97777-2233','amanda.m@email.com'),(12,'Gabriel Ramos','223.344.556-66','(11) 96666-3344','gabriel.ramos@email.com'),(13,'Larissa Melo','334.455.667-77','(19) 95555-4455','larissa.melo@email.com'),(14,'Felipe Castro','445.566.778-88','(21) 94444-5566','felipe.castro@email.com'),(15,'Patrícia Rocha','556.677.889-99','(11) 93333-6677','patricia.r@email.com');
+INSERT INTO `clientes` VALUES (1,'Nome Atualizado do Cliente','123.456.789-00','(11) 99999-0000','novo_email@teste.com'),(2,'Lucas Rodrigues','234.567.890-11','(11) 97777-6666','lucas.rod@email.com'),(3,'Mariana Costa','345.678.901-22','(21) 96666-5555','mari.costa@email.com'),(4,'Rodrigo Almeida','456.789.012-33','(31) 95555-4444','rodrigo.alm@email.com'),(5,'Beatriz Santos','567.890.123-44','(11) 94444-3333','bia.santos@email.com'),(6,'André Oliveira','678.890.123-55','(19) 93333-2222','andre.oli@email.com'),(7,'Camila Souza','789.012.345-66','(11) 92222-1111','camila.souza@email.com'),(8,'Ricardo Pereira','890.123.456-77','(21) 91111-0000','ricardo.p@email.com'),(9,'Fernanda Lima','901.234.567-88','(41) 99999-8888','fer.lima@email.com'),(10,'Thiago Barbosa','012.345.678-99','(11) 98888-1122','thiago.b@email.com'),(11,'Amanda Martins','112.233.445-55','(31) 97777-2233','amanda.m@email.com'),(12,'Gabriel Ramos','223.344.556-66','(11) 96666-3344','gabriel.ramos@email.com'),(13,'Larissa Melo','334.455.667-77','(19) 95555-4455','larissa.melo@email.com'),(14,'Felipe Castro da Silva','','',''),(15,'Patrícia Rocha','556.677.889-99','(11) 93333-6677','patricia.r@email.com'),(16,'Maria da Graça','829.166.620-22','6337613781','kojeho3272@ocuser.com'),(18,'Juliana Mendes','737.410.220-80','4726574367','kojeho3272@ocuser.com'),(19,'Fulano de tal','09900035211','','');
 /*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -55,10 +53,10 @@ DROP TABLE IF EXISTS `colaboradores`;
 CREATE TABLE `colaboradores` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
-  `cargo` enum('MECANICO','ATENDENTE') NOT NULL,
+  `cargo` varchar(100) NOT NULL,
   `especialidade` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,7 +65,7 @@ CREATE TABLE `colaboradores` (
 
 LOCK TABLES `colaboradores` WRITE;
 /*!40000 ALTER TABLE `colaboradores` DISABLE KEYS */;
-INSERT INTO `colaboradores` VALUES (1,'Carlos Souza','MECANICO','Injeção Eletrônica'),(2,'Marcos Lima','ATENDENTE','Recepção Comercial'),(3,'Roberto Alves','MECANICO','Suspensão e Freios'),(4,'Eliane Silveira','ATENDENTE','Faturamento'),(5,'Fernando Jorge','MECANICO','Motores de Linha Leve'),(6,'Alexandre Cruz','MECANICO','Alinhamento e Geometria'),(7,'Julio Cesar','MECANICO','Ar Condicionado Automotivo'),(8,'Sandra Regina','ATENDENTE','Pós-Venda'),(9,'Ricardo Dias','MECANICO','Câmbio Automático'),(10,'Marcelo Augusto','MECANICO','Elétrica Automotiva'),(11,'Bruna Mendes','ATENDENTE','Orçamentos'),(12,'Lucas Antunes','MECANICO','Mecânica Geral'),(13,'Eduardo Sales','MECANICO','Diagnóstico Scanner'),(14,'Tatiane Costa','ATENDENTE','Gerência de Atendimento'),(15,'Diego Meireles','MECANICO','Freios ABS e Hidráulica');
+INSERT INTO `colaboradores` VALUES (1,'Carlos Souza','MECANICO','Injeção Eletrônica'),(2,'Marcos Lima','ATENDENTE','Recepção Comercial'),(3,'Roberto Alves','MECANICO','Suspensão e Freios'),(4,'Eliane Silveira','ATENDENTE','Faturamento'),(5,'Fernando Jorge','MECANICO','Motores de Linha Leve'),(6,'Alexandre Cruz','MECANICO','Alinhamento e Geometria'),(7,'Julio Cesar','MECANICO','Ar Condicionado Automotivo'),(8,'Sandra Regina','ATENDENTE','Pós-Venda'),(9,'Ricardo Dias','MECANICO','Câmbio Automático'),(11,'Bruna Mendes','ATENDENTE','Orçamentos'),(12,'Lucas Antunes','MECANICO','Mecânica Geral'),(13,'Eduardo Sales','MECANICO','Diagnóstico Scanner'),(14,'Tatiane Costa','ATENDENTE','Gerência de Atendimento'),(15,'Diego Meireles','MECANICO','Freios ABS e Hidráulica'),(16,'Carlos Souza De Medeiros','Atendente de Mecânica','');
 /*!40000 ALTER TABLE `colaboradores` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -145,7 +143,7 @@ CREATE TABLE `ordens_servico` (
 
 LOCK TABLES `ordens_servico` WRITE;
 /*!40000 ALTER TABLE `ordens_servico` DISABLE KEYS */;
-INSERT INTO `ordens_servico` VALUES (1,1001,'CONCLUIDA','2026-06-01 08:30:00','2026-06-01 12:00:00',NULL,1,1,1,1,'MEIO_TANQUE','Sem avarias visíveis.',1,1,2,210.00,400.00,250.00),(2,1002,'CONCLUIDA','2026-06-02 09:15:00','2026-06-02 16:30:00',NULL,1,1,1,1,'CHEIO','Parachoque dianteiro levemente riscado.',2,2,4,120.00,0.00,120.00),(3,1003,'CONCLUIDA','2026-06-03 14:00:00','2026-06-04 10:00:00',NULL,1,0,1,1,'RESERVA','Falta chave de roda.',3,3,2,130.00,180.00,310.00),(4,1004,'AGUARDANDO_PECA','2026-06-05 10:30:00',NULL,'2026-06-05 11:45:00',1,1,1,0,'QUART_TANQUE','Rádio foi retirado pelo cliente.',4,4,11,350.00,160.00,510.00),(5,1005,'EM_ANDAMENTO','2026-06-08 08:00:00',NULL,NULL,1,1,1,1,'MEIO_TANQUE','Pequeno amassado na porta do motorista.',5,5,2,180.00,70.00,250.00),(6,1006,'CONCLUIDA','2026-06-08 13:20:00','2026-06-09 11:00:00',NULL,0,1,1,1,'CHEIO','Veículo sem estepe.',6,6,4,600.00,750.00,1350.00),(7,1007,'ABERTA','2026-06-12 11:00:00',NULL,NULL,1,1,1,1,'MEIO_TANQUE','Calota traseira direita quebrada.',7,7,2,0.00,0.00,0.00),(8,1008,'EM_ANDAMENTO','2026-06-11 09:00:00',NULL,NULL,1,1,1,1,'QUART_TANQUE','Arranhões na tampa do porta malas.',8,8,14,200.00,40.00,240.00),(9,1009,'CANCELADA','2026-06-02 11:00:00','2026-06-02 11:40:00',NULL,1,1,1,1,'CHEIO','Cliente desistiu do orçamento preliminar.',9,9,2,0.00,0.00,0.00),(10,1010,'CONCLUIDA','2026-06-04 15:30:00','2026-06-05 17:00:00',NULL,1,1,1,1,'MEIO_TANQUE','Vidro elétrico traseiro esquerdo travado.',10,10,11,150.00,140.00,290.00),(11,1011,'CONCLUIDA','2026-06-06 08:10:00','2026-06-06 12:00:00',NULL,1,1,1,1,'RESERVA','Banco de couro do motorista rasgado.',11,11,4,120.00,0.00,120.00),(12,1012,'EM_ANDAMENTO','2026-06-11 14:15:00',NULL,NULL,1,1,0,1,'CHEIO','Falta triângulo de sinalização.',12,12,2,280.00,760.00,1040.00),(13,1013,'CONCLUIDA','2026-06-09 10:00:00','2026-06-09 15:00:00',NULL,1,1,1,1,'MEIO_TANQUE','Retrovisor direito quebrado.',13,13,14,90.00,265.00,355.00),(14,1014,'AGUARDANDO_PECA','2026-06-10 08:45:00',NULL,'2026-06-10 14:20:00',1,1,1,1,'QUART_TANQUE','Sem avarias.',14,14,2,450.00,210.00,660.00),(15,1015,'CONCLUIDA','2026-06-03 11:20:00','2026-06-03 14:50:00',NULL,1,1,1,1,'CHEIO','Roda de liga leve ralada.',15,15,11,220.00,0.00,220.00);
+INSERT INTO `ordens_servico` VALUES (1,1001,'CONCLUIDA','2026-06-01 08:30:00','2026-06-01 12:00:00',NULL,1,1,1,1,'MEIO_TANQUE','Sem avarias visíveis.',1,1,2,210.00,400.00,250.00),(2,1002,'CONCLUIDA','2026-06-02 09:15:00','2026-06-02 16:30:00',NULL,1,1,1,1,'CHEIO','Parachoque dianteiro levemente riscado.',2,2,4,120.00,0.00,120.00),(3,1003,'CONCLUIDA','2026-06-03 14:00:00','2026-06-04 10:00:00',NULL,1,0,1,1,'RESERVA','Falta chave de roda.',3,3,2,130.00,180.00,310.00),(4,1004,'AGUARDANDO_PECA','2026-06-05 10:30:00',NULL,'2026-06-05 11:45:00',1,1,1,0,'QUART_TANQUE','Rádio foi retirado pelo cliente.',4,4,11,350.00,160.00,510.00),(5,1005,'EM_ANDAMENTO','2026-06-08 08:00:00',NULL,NULL,1,1,1,1,'MEIO_TANQUE','Pequeno amassado na porta do motorista.',5,5,2,180.00,70.00,250.00),(6,1006,'CONCLUIDA','2026-06-08 13:20:00','2026-06-09 11:00:00',NULL,0,1,1,1,'CHEIO','Veículo sem estepe.',6,6,4,600.00,750.00,1350.00),(7,1007,'CANCELADA','2026-06-12 11:00:00',NULL,NULL,1,1,1,1,'MEIO_TANQUE','Calota traseira direita quebrada. | OS CANCELADA. Motivo: Teste Juliana',7,7,2,0.00,0.00,0.00),(8,1008,'EM_ANDAMENTO','2026-06-11 09:00:00',NULL,NULL,1,1,1,1,'QUART_TANQUE','Arranhões na tampa do porta malas.',8,8,14,200.00,40.00,240.00),(9,1009,'CANCELADA','2026-06-02 11:00:00','2026-06-02 11:40:00',NULL,1,1,1,1,'CHEIO','Cliente desistiu do orçamento preliminar.',9,9,2,0.00,0.00,0.00),(10,1010,'CONCLUIDA','2026-06-04 15:30:00','2026-06-05 17:00:00',NULL,1,1,1,1,'MEIO_TANQUE','Vidro elétrico traseiro esquerdo travado.',10,10,11,150.00,140.00,290.00),(11,1011,'CONCLUIDA','2026-06-06 08:10:00','2026-06-06 12:00:00',NULL,1,1,1,1,'RESERVA','Banco de couro do motorista rasgado.',11,11,4,120.00,0.00,120.00),(12,1012,'EM_ANDAMENTO','2026-06-11 14:15:00',NULL,NULL,1,1,0,1,'CHEIO','Falta triângulo de sinalização.',12,12,2,280.00,760.00,1040.00),(13,1013,'CONCLUIDA','2026-06-09 10:00:00','2026-06-09 15:00:00',NULL,1,1,1,1,'MEIO_TANQUE','Retrovisor direito quebrado.',13,13,14,90.00,265.00,355.00),(14,1014,'AGUARDANDO_PECA','2026-06-10 08:45:00',NULL,'2026-06-10 14:20:00',1,1,1,1,'QUART_TANQUE','Sem avarias.',14,14,2,450.00,210.00,660.00),(15,1015,'CONCLUIDA','2026-06-03 11:20:00','2026-06-03 14:50:00',NULL,1,1,1,1,'CHEIO','Roda de liga leve ralada.',15,15,11,220.00,0.00,220.00);
 /*!40000 ALTER TABLE `ordens_servico` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -246,7 +244,7 @@ CREATE TABLE `pecas` (
   `preco_venda` decimal(10,2) NOT NULL,
   `estoque` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -271,7 +269,7 @@ CREATE TABLE `servicos` (
   `descricao` varchar(150) NOT NULL,
   `preco_tabela` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -280,8 +278,37 @@ CREATE TABLE `servicos` (
 
 LOCK TABLES `servicos` WRITE;
 /*!40000 ALTER TABLE `servicos` DISABLE KEYS */;
-INSERT INTO `servicos` VALUES (1,'Alinhamento e Balanceamento',120.00),(2,'Troca de Pastilha de Freio',130.00),(3,'Troca de Óleo e Filtro',90.00),(4,'Limpeza do Sistema de Arrefecimento',180.00),(5,'Carga de Gás do Ar Condicionado',200.00),(6,'Regulagem de Motor (Scanner)',150.00),(7,'Troca de Correia Dentada',350.00),(8,'Revisão do Sistema Suspensão',140.00),(9,'Troca de Embreagem',600.00),(10,'Reparo Elétrico (Iluminação)',110.00),(11,'Manutenção de Caixa de Direção',450.00),(12,'Troca de Amortecedores (Par)',280.00),(13,'Limpeza de Bicos Injetores',220.00),(14,'Troca de Fluido de Freio',100.00),(15,'Diagnóstico de Barulho Geral',80.00);
+INSERT INTO `servicos` VALUES (1,'Alinhamento e Balanceamento',120.00),(2,'Troca de Pastilha de Freio',130.00),(3,'Troca de Óleo e Filtro',90.00),(4,'Limpeza do Sistema de Arrefecimento',180.00),(5,'Carga de Gás do Ar Condicionado',200.00),(6,'Regulagem de Motor (Scanner)',150.00),(7,'Troca de Correia Dentada',350.00),(8,'Revisão do Sistema Suspensão',140.00),(9,'Troca de Embreagem',600.00),(10,'Reparo Elétrico (Iluminação)',110.00),(11,'Manutenção de Caixa de Direção',450.00),(12,'Troca de Amortecedores (Par)',280.00),(13,'Limpeza de Bicos Injetores',220.00),(14,'Troca de Fluido de Freio',100.00),(15,'Diagnóstico de Barulho em Geral',80.00),(16,'Alinhamento e Balanceamento 3D',249.50);
 /*!40000 ALTER TABLE `servicos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(50) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `colaborador_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `login` (`login`),
+  KEY `colaborador_id` (`colaborador_id`),
+  CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`colaborador_id`) REFERENCES `colaboradores` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,'carlos.mecanico','1234',1),(2,'marcos.atendente','4321',2),(3,'idd_juliana','1234',1),(4,'idd_tais','1234',2);
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -325,4 +352,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-06-14 20:02:41
+-- Dump completed on 2026-06-20 22:36:44
