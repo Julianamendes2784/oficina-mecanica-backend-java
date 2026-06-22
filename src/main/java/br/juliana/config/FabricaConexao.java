@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class FabricaConexao {
     // Ajuste a URL, usuário e senha conforme o seu banco de dados local
-    private static final String URL = "jdbc:mysql://localhost:3306/defaultdb?useSSL=false&allowPublicKeyRetrieval=true";
+    private static final String URL = "jdbc:mysql://localhost:3306/defaultdb";
     private static final String USUARIO = "root";
     private static final String SENHA = "";
 
