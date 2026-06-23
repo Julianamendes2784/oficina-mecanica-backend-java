@@ -2,7 +2,7 @@ package br.juliana.model;
 
 public class Peca {
     private Long id;
-    private String nomeComponente;
+    private String Nome;
     private double precoUnitario;
 
     // Construtor Vazio (Resolve o erro do construtor 'Peca()')
@@ -18,12 +18,12 @@ public class Peca {
         this.id = id;
     }
 
-    public String getNomeComponente() {
-        return nomeComponente;
+    public String getNome() {
+        return Nome;
     }
 
-    public void setNomeComponente(String nomeComponente) {
-        this.nomeComponente = nomeComponente;
+    public void setNome(String Nome) {
+        this.Nome = Nome;
     }
 
     public double getPrecoUnitario() {
