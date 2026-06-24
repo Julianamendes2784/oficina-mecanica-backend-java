@@ -468,7 +468,6 @@ public class Main {
     private static void abrirOrdemServicos() {
         System.out.println("\n--- ABERTURA DE ORDEM DE SERVIÇO ---");
 
-        // ETAPA 1: Cliente
         long clienteId = 0;
         while (clienteId == 0) {
             System.out.println("\n👤 CLIENTE (Obrigatório)");
@@ -502,7 +501,6 @@ public class Main {
             } else { System.out.println("⚠️ Opção inválida."); }
         }
 
-        // ETAPA 2: Veículo
         long veiculoId = 0;
         while (veiculoId == 0) {
             System.out.println("\n🚗 VEÍCULO");
@@ -537,7 +535,6 @@ public class Main {
             } else { System.out.println("⚠️ Opção inválida."); }
         }
 
-        // ETAPA 3: Mecânico responsável
         long colaboradorIdResponsavel = 0;
         while (colaboradorIdResponsavel == 0) {
             System.out.println("\n👔 MECÂNICO RESPONSÁVEL (obrigatório)");
@@ -561,7 +558,6 @@ public class Main {
             } else { System.out.println("⚠️ Opção inválida."); }
         }
 
-        // ETAPA 4: Checklist
         System.out.println("\n--- CHECKLIST DE ENTRADA (1 = SIM, 0 = NÃO) ---");
         System.out.print("Possui Estepe? "); boolean chkEstepe = scanner.nextLine().trim().equals("1");
         System.out.print("Possui Macaco e Chave de Roda? "); boolean chkMacaco = scanner.nextLine().trim().equals("1");
@@ -770,7 +766,7 @@ public class Main {
         int opcao = -1;
         while (opcao != 0) {
             System.out.println("\n--- MÓDULO: GESTÃO DE USUÁRIOS [ADMIN] ---");
-            System.out.println("1. Cadastrar Usuário  2. Listar Usuários  3. Desativar Usuário  4. Reativar Usuário  0. Voltar");
+            System.out.println("1. Cadastrar Usuário  2. Listar Usuários  3. Desativar Usuário  4. Reativar Usuário  5. Alterar Perfil  0. Voltar");
             System.out.print("Escolha: ");
             try { opcao = scanner.nextInt(); scanner.nextLine(); }
             catch (Exception e) { scanner.nextLine(); opcao = -1; continue; }
@@ -779,6 +775,7 @@ public class Main {
                 case 2: listarUsuarios(); break;
                 case 3: desativarUsuario(); break;
                 case 4: reativarUsuario(); break;
+                case 5: alterarPerfilUsuario(); break;
                 case 0: System.out.println("Voltando..."); break;
                 default: System.out.println("Opção inválida!"); break;
             }
@@ -840,6 +837,45 @@ public class Main {
             usuarioDAO.reativar(id);
             logAuditoriaDAO.registrar(new LogAuditoria(usuarioLogado.getId(), "usuarios", id, "UPDATE", "Usuário ID " + id + " reativado."));
         } else { System.out.println("↩️ Cancelado."); }
+    }
+
+    private static void alterarPerfilUsuario() {
+        System.out.println("\n--- ALTERAR PERFIL DE USUÁRIO ---");
+        listarUsuarios();
+
+        System.out.print("\nID do usuário a alterar: ");
+        int id;
+        try { id = scanner.nextInt(); scanner.nextLine(); }
+        catch (Exception e) { System.out.println("❌ ID inválido."); scanner.nextLine(); return; }
+
+        if (id == usuarioLogado.getId()) {
+            System.out.println("🚫 Você não pode alterar o seu próprio perfil!");
+            return;
+        }
+
+        System.out.println("Novo perfil:  1. PADRAO  2. ADMIN");
+        System.out.print("Escolha: ");
+        String escolha = scanner.nextLine().trim();
+
+        if (!escolha.equals("1") && !escolha.equals("2")) {
+            System.out.println("❌ Opção inválida. Operação cancelada.");
+            return;
+        }
+
+        String novoPerfil = escolha.equals("2") ? "ADMIN" : "PADRAO";
+
+        System.out.printf("Confirma alteração do perfil do usuário ID %d para %s? (1 = Sim / 0 = Não): ", id, novoPerfil);
+        if (scanner.nextLine().trim().equals("1")) {
+            boolean alterado = usuarioDAO.alterarPerfil(id, novoPerfil);
+            if (alterado) {
+                logAuditoriaDAO.registrar(new LogAuditoria(
+                        usuarioLogado.getId(), "usuarios", id, "UPDATE",
+                        "Perfil do usuário ID " + id + " alterado para: " + novoPerfil
+                ));
+            }
+        } else {
+            System.out.println("↩️ Operação cancelada.");
+        }
     }
 
     // ==========================================

@@ -1,0 +1,1120 @@
+openapi: 3.0.3
+info:
+  title: MecControl API
+  description: |
+    Documentação dos módulos e operações do sistema MecControl — 
+    Sistema de Gerenciamento de Oficina Mecânica desenvolvido para a Mecânica Toplíder.
+    
+    **Perfis de acesso:**
+    - `PADRAO` — acesso aos módulos gerais (clientes, veículos, OS, peças, serviços, colaboradores)
+    - `ADMIN` — acesso total, incluindo gestão de usuários e logs de auditoria
+  version: 1.0.0
+  contact:
+    name: Juliana — br.juliana
+servers:
+  - url: http://localhost
+    description: Aplicação desktop (CLI via JDBC/MySQL)
+
+tags:
+  - name: Autenticação
+    description: Login no sistema
+  - name: Clientes
+    description: Gestão de clientes
+  - name: Colaboradores
+    description: Gestão de colaboradores/mecânicos
+  - name: Serviços
+    description: Gestão de serviços prestados
+  - name: Veículos
+    description: Gestão de veículos
+  - name: Ordens de Serviço
+    description: Abertura e gerenciamento de O.S.
+  - name: Peças
+    description: Gestão de peças
+  - name: Usuários
+    description: Gestão de usuários — somente ADMIN
+  - name: Auditoria
+    description: Logs de auditoria — somente ADMIN
+
+paths:
+
+  # ─────────────────────────────────────────
+  # AUTENTICAÇÃO
+  # ─────────────────────────────────────────
+  /auth/login:
+    post:
+      tags: [Autenticação]
+      summary: Autenticar usuário
+      description: Valida login e senha. Apenas usuários ativos são autenticados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, senha]
+              properties:
+                login:
+                  type: string
+                  example: idd_juliana
+                senha:
+                  type: string
+                  example: senha123
+      responses:
+        '200':
+          description: Autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          description: Usuário/senha incorretos ou usuário inativo
+
+  # ─────────────────────────────────────────
+  # CLIENTES
+  # ─────────────────────────────────────────
+  /clientes:
+    get:
+      tags: [Clientes]
+      summary: Listar todos os clientes
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+    post:
+      tags: [Clientes]
+      summary: Cadastrar novo cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+      responses:
+        '201':
+          description: Cliente cadastrado com sucesso
+        '409':
+          description: CPF já cadastrado
+
+  /clientes/busca:
+    get:
+      tags: [Clientes]
+      summary: Buscar clientes por nome
+      parameters:
+        - name: nome
+          in: query
+          required: true
+          schema:
+            type: string
+          example: Carlos
+      responses:
+        '200':
+          description: Clientes encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+
+  /clientes/{id}:
+    put:
+      tags: [Clientes]
+      summary: Atualizar cadastro de cliente
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+      responses:
+        '200':
+          description: Cliente atualizado
+        '404':
+          description: Cliente não encontrado
+    delete:
+      tags: [Clientes]
+      summary: Excluir cliente
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Cliente excluído
+        '404':
+          description: Cliente não encontrado
+
+  # ─────────────────────────────────────────
+  # COLABORADORES
+  # ─────────────────────────────────────────
+  /colaboradores:
+    get:
+      tags: [Colaboradores]
+      summary: Listar todos os colaboradores
+      responses:
+        '200':
+          description: Lista de colaboradores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Colaborador'
+    post:
+      tags: [Colaboradores]
+      summary: Cadastrar novo colaborador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ColaboradorInput'
+      responses:
+        '201':
+          description: Colaborador cadastrado
+
+  /colaboradores/busca:
+    get:
+      tags: [Colaboradores]
+      summary: Buscar colaboradores por nome
+      parameters:
+        - name: nome
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Colaboradores encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Colaborador'
+
+  /colaboradores/{id}:
+    put:
+      tags: [Colaboradores]
+      summary: Atualizar colaborador
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ColaboradorInput'
+      responses:
+        '200':
+          description: Colaborador atualizado
+    delete:
+      tags: [Colaboradores]
+      summary: Excluir colaborador
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Colaborador excluído
+
+  # ─────────────────────────────────────────
+  # SERVIÇOS
+  # ─────────────────────────────────────────
+  /servicos:
+    get:
+      tags: [Serviços]
+      summary: Listar todos os serviços
+      responses:
+        '200':
+          description: Lista de serviços
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Servico'
+    post:
+      tags: [Serviços]
+      summary: Cadastrar novo serviço
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicoInput'
+      responses:
+        '201':
+          description: Serviço cadastrado
+
+  /servicos/busca:
+    get:
+      tags: [Serviços]
+      summary: Buscar serviços por descrição
+      parameters:
+        - name: descricao
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Serviços encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Servico'
+
+  /servicos/{id}:
+    put:
+      tags: [Serviços]
+      summary: Atualizar serviço
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicoInput'
+      responses:
+        '200':
+          description: Serviço atualizado
+    delete:
+      tags: [Serviços]
+      summary: Excluir serviço
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Serviço excluído
+
+  # ─────────────────────────────────────────
+  # VEÍCULOS
+  # ─────────────────────────────────────────
+  /veiculos:
+    get:
+      tags: [Veículos]
+      summary: Listar todos os veículos
+      responses:
+        '200':
+          description: Lista de veículos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Veiculo'
+    post:
+      tags: [Veículos]
+      summary: Cadastrar novo veículo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VeiculoInput'
+      responses:
+        '201':
+          description: Veículo cadastrado
+
+  /veiculos/busca:
+    get:
+      tags: [Veículos]
+      summary: Buscar veículo por placa ou modelo
+      parameters:
+        - name: termo
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Veículos encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Veiculo'
+
+  /veiculos/{id}:
+    put:
+      tags: [Veículos]
+      summary: Atualizar veículo
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VeiculoUpdateInput'
+      responses:
+        '200':
+          description: Veículo atualizado
+    delete:
+      tags: [Veículos]
+      summary: Excluir veículo
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Veículo excluído
+
+  # ─────────────────────────────────────────
+  # ORDENS DE SERVIÇO
+  # ─────────────────────────────────────────
+  /ordens-servico:
+    get:
+      tags: [Ordens de Serviço]
+      summary: Listar todas as O.S.
+      responses:
+        '200':
+          description: Lista de ordens de serviço
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdemServico'
+    post:
+      tags: [Ordens de Serviço]
+      summary: Abrir nova O.S. com checklist de entrada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdemServicoInput'
+      responses:
+        '201':
+          description: O.S. aberta com sucesso
+
+  /ordens-servico/busca:
+    get:
+      tags: [Ordens de Serviço]
+      summary: Buscar O.S. por situação ou período
+      parameters:
+        - name: situacao
+          in: query
+          schema:
+            type: string
+            enum: [ABERTA, CANCELADA, CONCLUIDA]
+        - name: dataInicio
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2025-01-01"
+        - name: dataFim
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2025-12-31"
+      responses:
+        '200':
+          description: O.S. encontradas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdemServico'
+
+  /ordens-servico/{id}/cancelar:
+    patch:
+      tags: [Ordens de Serviço]
+      summary: Cancelar uma O.S.
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [motivo]
+              properties:
+                motivo:
+                  type: string
+                  example: Cliente desistiu do serviço
+      responses:
+        '200':
+          description: O.S. cancelada
+        '404':
+          description: O.S. não encontrada
+
+  /ordens-servico/{id}/mecanicos:
+    get:
+      tags: [Ordens de Serviço]
+      summary: Listar mecânicos da O.S.
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Mecânicos registrados na O.S.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OsMecanico'
+    post:
+      tags: [Ordens de Serviço]
+      summary: Adicionar mecânico à O.S.
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [colaboradorId]
+              properties:
+                colaboradorId:
+                  type: integer
+                  example: 3
+      responses:
+        '201':
+          description: Mecânico adicionado
+
+  /ordens-servico/{id}/servicos:
+    post:
+      tags: [Ordens de Serviço]
+      summary: Adicionar serviço à O.S.
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [servicoId, precoAplicado]
+              properties:
+                servicoId:
+                  type: integer
+                  example: 2
+                precoAplicado:
+                  type: number
+                  format: double
+                  example: 150.00
+      responses:
+        '201':
+          description: Serviço adicionado à O.S.
+
+  /ordens-servico/{id}/pecas:
+    get:
+      tags: [Ordens de Serviço]
+      summary: Listar peças utilizadas na O.S.
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Peças da O.S.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OsPeca'
+    post:
+      tags: [Ordens de Serviço]
+      summary: Adicionar peça à O.S.
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pecaId, quantidade, precoAplicado]
+              properties:
+                pecaId:
+                  type: integer
+                  example: 5
+                quantidade:
+                  type: integer
+                  example: 2
+                precoAplicado:
+                  type: number
+                  format: double
+                  example: 89.90
+      responses:
+        '201':
+          description: Peça adicionada à O.S.
+
+  # ─────────────────────────────────────────
+  # PEÇAS
+  # ─────────────────────────────────────────
+  /pecas:
+    get:
+      tags: [Peças]
+      summary: Listar todas as peças
+      responses:
+        '200':
+          description: Lista de peças
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Peca'
+    post:
+      tags: [Peças]
+      summary: Cadastrar nova peça
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PecaInput'
+      responses:
+        '201':
+          description: Peça cadastrada
+
+  /pecas/busca:
+    get:
+      tags: [Peças]
+      summary: Buscar peça por nome ou ID
+      parameters:
+        - name: termo
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Peças encontradas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Peca'
+
+  /pecas/{id}:
+    delete:
+      tags: [Peças]
+      summary: Excluir peça
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Peça excluída
+
+  # ─────────────────────────────────────────
+  # USUÁRIOS  [ADMIN]
+  # ─────────────────────────────────────────
+  /usuarios:
+    get:
+      tags: [Usuários]
+      summary: Listar todos os usuários — ADMIN
+      security:
+        - perfilAdmin: []
+      responses:
+        '200':
+          description: Lista de usuários ordenada por ID
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+        '403':
+          description: Acesso negado
+    post:
+      tags: [Usuários]
+      summary: Cadastrar novo usuário — ADMIN
+      security:
+        - perfilAdmin: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInput'
+      responses:
+        '201':
+          description: Usuário cadastrado
+        '409':
+          description: Login já existe
+
+  /usuarios/{id}/desativar:
+    patch:
+      tags: [Usuários]
+      summary: Desativar usuário — ADMIN
+      description: Soft-delete. Não é permitido desativar o próprio usuário logado.
+      security:
+        - perfilAdmin: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Usuário desativado
+        '403':
+          description: Não é permitido desativar a si mesmo
+
+  /usuarios/{id}/reativar:
+    patch:
+      tags: [Usuários]
+      summary: Reativar usuário — ADMIN
+      security:
+        - perfilAdmin: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      responses:
+        '200':
+          description: Usuário reativado
+
+  /usuarios/{id}/perfil:
+    patch:
+      tags: [Usuários]
+      summary: Alterar perfil do usuário — ADMIN
+      description: Altera o perfil entre PADRAO e ADMIN. Não é permitido alterar o próprio perfil.
+      security:
+        - perfilAdmin: []
+      parameters:
+        - $ref: '#/components/parameters/PathId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [perfil]
+              properties:
+                perfil:
+                  type: string
+                  enum: [PADRAO, ADMIN]
+                  example: ADMIN
+      responses:
+        '200':
+          description: Perfil atualizado com sucesso
+        '403':
+          description: Não é permitido alterar o próprio perfil
+        '404':
+          description: Usuário não encontrado
+
+  # ─────────────────────────────────────────
+  # AUDITORIA  [ADMIN]
+  # ─────────────────────────────────────────
+  /auditoria:
+    get:
+      tags: [Auditoria]
+      summary: Listar todos os logs de auditoria — ADMIN
+      security:
+        - perfilAdmin: []
+      responses:
+        '200':
+          description: Todos os logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogAuditoria'
+
+  /auditoria/busca:
+    get:
+      tags: [Auditoria]
+      summary: Filtrar logs por entidade ou tipo de operação — ADMIN
+      security:
+        - perfilAdmin: []
+      parameters:
+        - name: entidade
+          in: query
+          schema:
+            type: string
+            example: usuarios
+        - name: tipoOperacao
+          in: query
+          schema:
+            type: string
+            enum: [INSERT, UPDATE, DELETE]
+      responses:
+        '200':
+          description: Logs filtrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogAuditoria'
+
+# ─────────────────────────────────────────
+# COMPONENTS
+# ─────────────────────────────────────────
+components:
+
+  parameters:
+    PathId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+  securitySchemes:
+    perfilAdmin:
+      type: apiKey
+      in: header
+      name: X-Perfil-Usuario
+      description: Requer perfil ADMIN autenticado no sistema
+
+  schemas:
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        login:
+          type: string
+          example: idd_juliana
+        perfil:
+          type: string
+          enum: [PADRAO, ADMIN]
+          example: ADMIN
+        colaboradorId:
+          type: integer
+          example: 1
+        ativo:
+          type: boolean
+          example: true
+
+    UsuarioInput:
+      type: object
+      required: [login, senha, perfil]
+      properties:
+        login:
+          type: string
+          example: idd_novo
+        senha:
+          type: string
+          example: senha123
+        perfil:
+          type: string
+          enum: [PADRAO, ADMIN]
+          example: PADRAO
+        colaboradorId:
+          type: integer
+          nullable: true
+          example: 2
+
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: João Silva
+        cpf:
+          type: string
+          example: 123.456.789-00
+        telefone:
+          type: string
+          example: (48) 99999-0000
+        email:
+          type: string
+          example: joao@email.com
+
+    ClienteInput:
+      type: object
+      required: [nome, cpf]
+      properties:
+        nome:
+          type: string
+          example: João Silva
+        cpf:
+          type: string
+          example: 123.456.789-00
+        telefone:
+          type: string
+          example: (48) 99999-0000
+        email:
+          type: string
+          example: joao@email.com
+
+    Colaborador:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: Carlos Mecânico
+        cargo:
+          type: string
+          example: Mecânico
+        especialidade:
+          type: string
+          example: Motor e Suspensão
+
+    ColaboradorInput:
+      type: object
+      required: [nome, cargo]
+      properties:
+        nome:
+          type: string
+          example: Carlos Mecânico
+        cargo:
+          type: string
+          example: Mecânico
+        especialidade:
+          type: string
+          example: Motor e Suspensão
+
+    Servico:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        descricao:
+          type: string
+          example: Troca de óleo
+        precoTabela:
+          type: number
+          format: double
+          example: 120.00
+
+    ServicoInput:
+      type: object
+      required: [descricao, precoTabela]
+      properties:
+        descricao:
+          type: string
+          example: Troca de óleo
+        precoTabela:
+          type: number
+          format: double
+          example: 120.00
+
+    Veiculo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        placa:
+          type: string
+          example: ABC-1234
+        modelo:
+          type: string
+          example: Gol 1.0
+        ano:
+          type: integer
+          example: 2019
+        cor:
+          type: string
+          example: Prata
+        quilometragem:
+          type: integer
+          example: 75000
+        clienteId:
+          type: integer
+          example: 1
+
+    VeiculoInput:
+      type: object
+      required: [placa, modelo, clienteId]
+      properties:
+        placa:
+          type: string
+          example: ABC-1234
+        modelo:
+          type: string
+          example: Gol 1.0
+        ano:
+          type: integer
+          example: 2019
+        cor:
+          type: string
+          example: Prata
+        quilometragem:
+          type: integer
+          example: 75000
+        clienteId:
+          type: integer
+          example: 1
+
+    VeiculoUpdateInput:
+      type: object
+      properties:
+        modelo:
+          type: string
+          example: Gol 1.6
+        ano:
+          type: integer
+          example: 2020
+        cor:
+          type: string
+          example: Branco
+        quilometragem:
+          type: integer
+          example: 80000
+
+    OrdemServico:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        situacao:
+          type: string
+          enum: [ABERTA, CANCELADA, CONCLUIDA]
+          example: ABERTA
+        dataAbertura:
+          type: string
+          format: date-time
+          example: "2025-05-10T09:00:00"
+        clienteId:
+          type: integer
+          example: 1
+        veiculoId:
+          type: integer
+          example: 1
+        abertoPorColaboradorId:
+          type: integer
+          example: 2
+        valorTotalServicos:
+          type: number
+          format: double
+          example: 300.00
+        valorTotalPecas:
+          type: number
+          format: double
+          example: 180.00
+        valorTotalGeral:
+          type: number
+          format: double
+          example: 480.00
+
+    OrdemServicoInput:
+      type: object
+      required: [clienteId, veiculoId, abertoPorColaboradorId]
+      properties:
+        clienteId:
+          type: integer
+          example: 1
+        veiculoId:
+          type: integer
+          example: 1
+        abertoPorColaboradorId:
+          type: integer
+          example: 2
+        chkEstepe:
+          type: boolean
+          example: true
+        chkMacacoChaveRoda:
+          type: boolean
+          example: true
+        chkTriangulo:
+          type: boolean
+          example: false
+        chkRadio:
+          type: boolean
+          example: true
+        chkNivelCombustivel:
+          type: string
+          enum: [CHEIO, MEIO_TANQUE, RESERVA]
+          example: MEIO_TANQUE
+        chkObservacoesAvarias:
+          type: string
+          example: Arranhão no para-choque traseiro
+
+    OsMecanico:
+      type: object
+      properties:
+        osId:
+          type: integer
+          example: 1
+        colaboradorId:
+          type: integer
+          example: 3
+
+    OsPeca:
+      type: object
+      properties:
+        osId:
+          type: integer
+          example: 1
+        pecaId:
+          type: integer
+          example: 5
+        quantidade:
+          type: integer
+          example: 2
+        precoAplicado:
+          type: number
+          format: double
+          example: 89.90
+
+    Peca:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: Filtro de óleo
+        precoUnitario:
+          type: number
+          format: double
+          example: 45.00
+
+    PecaInput:
+      type: object
+      required: [nome, precoUnitario]
+      properties:
+        nome:
+          type: string
+          example: Filtro de óleo
+        precoUnitario:
+          type: number
+          format: double
+          example: 45.00
+
+    LogAuditoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        usuarioId:
+          type: integer
+          example: 3
+        entidadeAfetada:
+          type: string
+          example: usuarios
+        registroId:
+          type: integer
+          example: 12
+        tipoOperacao:
+          type: string
+          enum: [INSERT, UPDATE, DELETE]
+          example: UPDATE
+        descricaoMudanca:
+          type: string
+          example: "Perfil do usuário ID 12 alterado para: ADMIN"
+        dataAlteracao:
+          type: string
+          format: date-time
+          example: "2025-05-10T10:30:00"
