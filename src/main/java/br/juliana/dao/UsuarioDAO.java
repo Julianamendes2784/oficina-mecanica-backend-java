@@ -9,7 +9,6 @@ import java.util.List;
 
 public class UsuarioDAO {
 
-    // ── Mapeia um ResultSet para um objeto Usuario ────────────────────────────
     private Usuario mapear(ResultSet rs) throws SQLException {
         return Usuario.builder()
                 .id(rs.getInt("id"))
@@ -21,7 +20,6 @@ public class UsuarioDAO {
                 .build();
     }
 
-    // ── Autentica apenas usuários ativos ──────────────────────────────────────
     public Usuario autenticar(String login, String senha) {
         String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ? AND ativo = 1";
 
@@ -42,7 +40,6 @@ public class UsuarioDAO {
         return null;
     }
 
-    // ── Cadastra um novo usuário ──────────────────────────────────────────────
     public void cadastrar(Usuario u) {
         String sql = "INSERT INTO usuarios (login, senha, colaborador_id, perfil, ativo) VALUES (?, ?, ?, ?, 1)";
 
@@ -72,10 +69,9 @@ public class UsuarioDAO {
         }
     }
 
-    // ── Lista todos os usuários ───────────────────────────────────────────────
     public List<Usuario> listarTodos() {
         List<Usuario> lista = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios ORDER BY login";
+        String sql = "SELECT * FROM usuarios ORDER BY id ASC";
 
         try (Connection conn = FabricaConexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -90,7 +86,6 @@ public class UsuarioDAO {
         return lista;
     }
 
-    // ── Desativa um usuário (nunca exclui) ────────────────────────────────────
     public void desativar(int id) {
         String sql = "UPDATE usuarios SET ativo = 0 WHERE id = ?";
 
@@ -111,7 +106,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ── Reativa um usuário ────────────────────────────────────────────────────
     public void reativar(int id) {
         String sql = "UPDATE usuarios SET ativo = 1 WHERE id = ?";
 
@@ -129,6 +123,30 @@ public class UsuarioDAO {
 
         } catch (SQLException e) {
             System.err.println("Erro ao reativar usuário: " + e.getMessage());
+        }
+    }
+
+    public boolean alterarPerfil(int id, String novoPerfil) {
+        String sql = "UPDATE usuarios SET perfil = ? WHERE id = ?";
+
+        try (Connection conn = FabricaConexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, novoPerfil);
+            stmt.setInt(2, id);
+            int linhasAfetadas = stmt.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                System.out.println("✅ Perfil atualizado para " + novoPerfil + " com sucesso!");
+                return true;
+            } else {
+                System.out.println("❌ Nenhum usuário encontrado com esse ID.");
+                return false;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao alterar perfil: " + e.getMessage());
+            return false;
         }
     }
 }
